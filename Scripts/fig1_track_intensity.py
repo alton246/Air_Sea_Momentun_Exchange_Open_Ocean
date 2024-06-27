@@ -116,7 +116,7 @@ fig = plt.figure(figsize=(4,4))
 ax1 = plt.subplot2grid(gridsize, (0,0), colspan=1, rowspan=1, projection=crs)
 
 
-Cartopy_Features(ax1, 8, plot_area_track, 4, 4)
+Cartopy_Features(ax1, 8, plot_area_track, 4, 4, 'k')
 #Scatter
 ax1.scatter(earl_bt_data.lons[::bt_skip], earl_bt_data.lats[::bt_skip], marker="o", color=earl_bt_data.colors[::bt_skip].flatten().tolist(),
             edgecolors=earl_bt_data.colors[::bt_skip].flatten().tolist(), s=size, label='best track')
