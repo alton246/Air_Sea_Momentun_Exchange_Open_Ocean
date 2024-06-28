@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 import datetime
@@ -17,7 +16,7 @@ import cartopy.crs as ccrs
 import cartopy
 import cartopy.feature as cfeature
 import cartopy.io.img_tiles as cimgt
-
+import xarray as xr
 
 
 class atcf_csv():
@@ -142,12 +141,49 @@ def convert_latlon_to_decimal(coord):
         lat_lon = -1 * float(coord[:-1])               
     return lat_lon
 
+
+def argminDatetime(time0,time):
+    """
+    Returns the index of datetime array time for which
+    the datetime time0 is nearest.
+    """
+    return np.argmin(np.abs(date2num(time0)-date2num(time)))
+
+def getStormDirection(time,track):
+    """
+    Given datetime and atcf track objects, this function returns
+    storm propagation direction.
+    """
+    nup = argminDatetime(time+timedelta(hours=3),track.time)
+    ndn = argminDatetime(time-timedelta(hours=3),track.time)
+
+    dlon = track.lon[nup]-track.lon[ndn]
+    dlat = track.lat[nup]-track.lat[ndn]
+
+    return np.arctan2(dlat,dlon)
+
 def getStormCenter(time,track):
     """
     Returns the (lon,lat) storm center fiven an atcf track instance.
     """
     ind = np.argmin(np.abs(date2num(time)-date2num(track.time)))
     return track.lon[ind],track.lat[ind]
+
+
+def latlon2xyStormRelative(lon,lat,lon0,lat0,dir=0.5*np.pi):
+    """
+    Given (lon,lat) fields, returns (x,y) distance in meters 
+    from (lon0,lat0). If dir [radians] is specified, rotates (x,y)
+    so that positive y-axis is pointing in direction dir.
+    """
+    Re   = 6.371E6
+    d2km = np.pi*Re/180.*1E-3
+    d2r  = np.pi/180.
+    Y = (lat-lat0)*d2km
+    X = (lon-lon0)*d2km*np.cos(lat*d2r)
+    x = X*np.sin(dir)-Y*np.cos(dir)
+    y = X*np.cos(dir)+Y*np.sin(dir)
+    return x,y
 
 def counter(PATH, track_file, Storm_Name, Year):
     #File Reader
@@ -162,8 +198,6 @@ def counter(PATH, track_file, Storm_Name, Year):
             counter = counter + 1
 
     return counter, new_rows
-
-
 
 def ReturnColorIntensity(wspds):
     col = []
@@ -235,6 +269,88 @@ def Cartopy_Features(axis, fontsize, plot_area, xlocator, ylocator):
         """Plot area is a list in the form 
         [max_lon_track + 360.0, min_lon_track + 360.0, min_lat_track,max_lat_track]
         """
+
+def julian_to_regular(julian_day):
+    # Calculate the base date for Julian day
+    base_date = datetime(2010, 1, 1)
+    # Add the number of days to the base date
+    target_date = base_date + timedelta(days=julian_day)
+    return target_date.strftime("%Y-%m-%d")
+
+def add_storm_relative_essentials(axis):
+    # axis.axvline(0, color='k', linestyle='solid', linewidth=0.5)
+    # axis.axhline(0, color='k', linestyle='solid', linewidth=0.5)
+    # axis.arrow(0, 0, 0, 250, width=1.5, color='k')
+
+    axis.axvline(0, color='k', linestyle='solid', linewidth=0.5)
+    axis.axhline(0, color='k', linestyle='solid', linewidth=0.5)
+    axis.arrow(0, 0, 0, 175, width=0.75, color='k')
+    first_circle_wspd = plt.Circle( (0, 0), 50, lw=0.5, fill = False, color='k')
+    second_circle_wspd = plt.Circle( (0, 0), 150, lw=0.5, fill = False, color='k')
+    third_circle_wspd = plt.Circle( (0, 0), 250, lw=0.5, fill = False, color='k')
+    axis.add_artist(first_circle_wspd)
+    axis.add_artist(second_circle_wspd)
+    axis.add_artist(third_circle_wspd)
+
+def getSWHSymmetry(dist_x_vals, dist_y_vals, data, min_x_dist, max_x_dist, min_y_dist, max_y_dist):
+    dist_x_vals = dist_x_vals.values.flatten() #flattening data
+    dist_y_vals = dist_y_vals.values.flatten() #flattening data
+
+    #obtaining indices of distances between 0 and 100 km
+    indices =np.where((dist_y_vals>=min_y_dist) & (dist_y_vals<=max_y_dist ) & 
+         (dist_x_vals >= min_x_dist) & (dist_x_vals <= max_x_dist))
+    
+    dist_subset=dist_x_vals[indices]
+
+    #Locating swh values that are between 0 and 100 km
+    swh_vals = data.values.flatten() #flattening wave height data
+    swh_subset= swh_vals[indices]
+
+    return swh_subset, dist_subset
+
+def EquatLenOfList(val1, val2):
+    num_nans = np.abs(len(val1) - len(val2))
+
+    if len(val1) < len(val2):
+        new_val1 = val1.tolist() + [float('nan')] * num_nans
+        new_val2 = val2
+
+    elif len(val2) < len(val1):
+        new_val1 = val2.tolist() + [float('nan')] * num_nans
+        new_val2= val1
+
+    else:
+        new_val1 = val1.copy()
+        new_val2 = val2.copy()
+
+    return new_val1, new_val2 ;
+
+def AlongTrackCrossSection(awo_x_dist, awo_y_dist, awo_temp, awo_ws_x_dist, awo_ws_y_dist, awo_ws_temp):
+
+    awo_surf_temp_symmetry, awo_x_dist_subset_temp = getSWHSymmetry(awo_x_dist, awo_y_dist, awo_temp,
+                                                            -250, 250, -1, 2)
+    awo_ws_surf_temp_symmetry, awo_ws_x_dist_subset_temp = getSWHSymmetry(awo_ws_x_dist, awo_ws_y_dist, 
+                                                                awo_ws_temp, -250, 250, -1, 2)
+
+    awo_temp_tested, awo_ws_temp_tested = EquatLenOfList(awo_surf_temp_symmetry, awo_ws_surf_temp_symmetry)
+    awo_dist_tested, awo_ws_dist_tested = EquatLenOfList(awo_x_dist_subset_temp, awo_ws_x_dist_subset_temp)
+
+    return awo_temp_tested, awo_dist_tested, awo_ws_temp_tested, awo_ws_dist_tested
+
+def GetBathyData(PATH, file):
+    awo_ocn_data = xr.open_dataset(PATH + 'awo5_2010082700_gfs_3.7.1/' + file)
+
+    return awo_ocn_data['bathymetry']
+
+def Cartopy_Features(axis, fontsize, plot_area, xlocator, ylocator, linecolor):
+        """Plot area is a list in the form 
+        [max_lon_track + 360.0, min_lon_track + 360.0, min_lat_track,max_lat_track]
+        """
+
+        # pylab.rcParams['xtick.major.pad']='0'
+        # pylab.rcParams['ytick.major.pad']='0'
+
+
         #Setting coast, lakes and projection
         coast = cfeature.GSHHSFeature(scale='high', levels=[1,], edgecolor='k')
         lakes = cfeature.GSHHSFeature(scale='high', levels=[2,], edgecolor='face',facecolor='grey')
@@ -242,16 +358,17 @@ def Cartopy_Features(axis, fontsize, plot_area, xlocator, ylocator):
         axis.add_feature(coast)
         axis.add_feature(lakes)
         axis.add_feature(cfeature.BORDERS, linewidth=0.75)
+        axis.add_feature(cfeature.BORDERS, linewidth=0.25)
         # ax1.add_feature(cfeature.OCEAN)
         states_provinces = cfeature.NaturalEarthFeature(
                 category='cultural',
                 name='admin_1_states_provinces_lines',
                 scale='110m')
-        axis.add_feature(states_provinces, linewidth=0.75)
+        axis.add_feature(states_provinces, linewidth=0.25)
         axis.set_extent(plot_area, crs=ccrs.PlateCarree())
 
         gl = axis.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
-                        linewidth=0.5, color='k', alpha=0.7, linestyle='--')
+                        linewidth=0.2, color=linecolor, alpha=0.7, linestyle='--')
         gl.top_labels = False
         gl.right_labels = False
         # gl.bottom_labels = False
@@ -259,6 +376,38 @@ def Cartopy_Features(axis, fontsize, plot_area, xlocator, ylocator):
         gl.ylocator = mticker.FixedLocator(np.arange(-90, 90, ylocator))
         gl.xlabel_style = {'size': fontsize, 'color': 'black'}
         gl.ylabel_style = {'size': fontsize, 'color': 'black'}
+        gl.xpadding = 0.5
+        gl.ypadding = 0.5
+
+
+# def Cartopy_Features(axis, fontsize, plot_area, xlocator, ylocator):
+#         """Plot area is a list in the form 
+#         [max_lon_track + 360.0, min_lon_track + 360.0, min_lat_track,max_lat_track]
+#         """
+#         #Setting coast, lakes and projection
+#         coast = cfeature.GSHHSFeature(scale='high', levels=[1,], edgecolor='k')
+#         lakes = cfeature.GSHHSFeature(scale='high', levels=[2,], edgecolor='face',facecolor='grey')
+#         axis.add_feature(cfeature.LAND, color='white')
+#         axis.add_feature(coast)
+#         axis.add_feature(lakes)
+#         axis.add_feature(cfeature.BORDERS, linewidth=0.75)
+#         # ax1.add_feature(cfeature.OCEAN)
+#         states_provinces = cfeature.NaturalEarthFeature(
+#                 category='cultural',
+#                 name='admin_1_states_provinces_lines',
+#                 scale='110m')
+#         axis.add_feature(states_provinces, linewidth=0.75)
+#         axis.set_extent(plot_area, crs=ccrs.PlateCarree())
+
+#         gl = axis.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+#                         linewidth=0.5, color='k', alpha=0.7, linestyle='--')
+#         gl.top_labels = False
+#         gl.right_labels = False
+#         # gl.bottom_labels = False
+#         gl.xlocator = mticker.FixedLocator(np.arange(-180, 180,xlocator))
+#         gl.ylocator = mticker.FixedLocator(np.arange(-90, 90, ylocator))
+#         gl.xlabel_style = {'size': fontsize, 'color': 'black'}
+#         gl.ylabel_style = {'size': fontsize, 'color': 'black'}
 
 def Track_Legend(axis, fontsize, markersize, xlocator, ylocator, loc):
         #Handles for legend
@@ -278,8 +427,19 @@ def Track_Legend(axis, fontsize, markersize, xlocator, ylocator, loc):
                         prop = { "size": fontsize }, bbox_to_anchor=(xlocator, ylocator),
                         frameon=True, fancybox=True, shadow=True, loc=loc)
         
-def add_corner_label(ax, text, fontsize=9):
-    ax.text(0.03, 0.86, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
+
+        
+def Track_Legend_v2(axis, fontsize, markersize, xlocator, ylocator, loc):
+        #Handles for legend
+        bt = mlines.Line2D([], [], color='black', marker='s', markersize=markersize, ls='solid', label='best track')
+        awo = mlines.Line2D([], [], color='red', marker='o', markersize=markersize, ls='solid', label='$AWO$-$CTL$')
+        awo_ws = mlines.Line2D([], [], color='cyan', marker='*', markersize=markersize,ls='solid', label='$AWO_{ws}$-$EXP$')
+        axis.legend(handles=[bt, awo_ws, awo], 
+                        prop = { "size": fontsize }, bbox_to_anchor=(xlocator, ylocator),
+                        frameon=True, fancybox=True, shadow=True, loc=loc)
+        
+def add_corner_label(ax, text, fontsize):
+    ax.text(0.03, 0.92, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
 
 
 
@@ -302,6 +462,7 @@ def add_surf_curr_colorbar(axis, data, ticks):
         cbaxes.tick_params(labelsize=10, colors='red', bottom=False, top=True, labeltop=True, labelbottom=False)
 
 
+
 def add_storm_relative_essentials(axis):
     # axis.axvline(0, color='k', linestyle='solid', linewidth=0.5)
     # axis.axhline(0, color='k', linestyle='solid', linewidth=0.5)
@@ -316,3 +477,20 @@ def add_storm_relative_essentials(axis):
     axis.add_artist(first_circle_wspd)
     axis.add_artist(second_circle_wspd)
     axis.add_artist(third_circle_wspd)
+
+def cross_section_essential(x_pos, y_pos, fontsize, lw):
+    #Vertical line separating the right and left of the storm
+    plt.axvline(x=0, color = 'k', linestyle='--', lw=lw)
+    plt.text(x_pos,y_pos, 'R', fontweight='bold', fontsize=fontsize)
+    plt.text(-1 * x_pos,y_pos, 'L', fontweight='bold', fontsize=fontsize)
+
+def add_axis_labels(axis, fontsize, labelpad, labelsize, xticks, yticks):
+    axis.set_ylabel('Depth (m)', fontsize=fontsize, labelpad=labelpad)
+    axis.set_xlabel('Distance to Storm Center (km)', fontsize=fontsize, labelpad=labelpad)
+    axis.set_xticks(ticks=xticks)
+    axis.set_yticks(ticks=yticks)
+    axis.tick_params(axis='both', which='major', labelsize=labelsize, length=1, width=1, pad=0.5)
+
+def add_corner_label(ax, text, fontsize=9):
+    ax.text(0.03, 0.84, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
+
