@@ -22,6 +22,8 @@ import cartopy.io.img_tiles as cimgt
 
 PATH_Hur = '/home/disk/orca/adaley17/Research/Stress_Separation/Hurricane_Earl/Data/'
 PNG='/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
+PNG2='/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentum_Exchange_TC_Coast/Notebooks/Figure1/'
+
 earl_awo = PATH_Hur + 'earl_5.log_awo.csv'
 earl_awo_ws = PATH_Hur + 'earl_5.log_awo-ws.csv'
 
@@ -118,17 +120,17 @@ ax1 = plt.subplot2grid(gridsize, (0,0), colspan=1, rowspan=1, projection=crs)
 
 Cartopy_Features(ax1, 8, plot_area_track, 4, 4, 'k')
 #Scatter
-ax1.scatter(earl_bt_data.lons[::bt_skip], earl_bt_data.lats[::bt_skip], marker="o", color=earl_bt_data.colors[::bt_skip].flatten().tolist(),
-            edgecolors=earl_bt_data.colors[::bt_skip].flatten().tolist(), s=size, label='best track')
-ax1.scatter(storm_centers_awo[:,0][::mod_skip], storm_centers_awo[:,1][::mod_skip], marker="s", 
+ax1.scatter(earl_bt_data.lons[::bt_skip], earl_bt_data.lats[::bt_skip], marker="s", color='k',
+            edgecolors='k', s=size, label='best track')
+ax1.scatter(storm_centers_awo[:,0][::mod_skip], storm_centers_awo[:,1][::mod_skip], marker="o", 
             facecolors='red',s=size)
 ax1.scatter(storm_centers_awo_ws[:,0][::mod_skip], storm_centers_awo_ws[:,1][::mod_skip], marker="*", 
             facecolors='cyan', s=size)
 
 #Line Plots
 ax1.plot(earl_bt_data.lons, earl_bt_data.lats, linestyle='-', color='k', linewidth=lw, label='best track')
-ax1.plot(storm_centers_awo[:,0], storm_centers_awo[:,1], linewidth=lw, linestyle='-', color='red', label='awo')
-ax1.plot(storm_centers_awo_ws[:,0], storm_centers_awo_ws[:,1], linewidth=lw, linestyle='-', color='cyan', label='awo_ws')
+ax1.plot(storm_centers_awo[:,0], storm_centers_awo[:,1], linewidth=lw, linestyle='-', color='red', label='$AWO$')
+ax1.plot(storm_centers_awo_ws[:,0], storm_centers_awo_ws[:,1], linewidth=lw, linestyle='-', color='cyan', label='$AWO_{ws}$')
 
 for i in range(len(track_awo.time[::skip])):
     print(track_awo.time[::skip][i])
@@ -141,15 +143,18 @@ for i in range(len(track_awo.time[::skip])):
     x_awo_ws = [storm_centers_awo_ws[:,0][::skip][i], storm_centers_awo[:,0][::skip][i]+1]
     y_awo_ws = [storm_centers_awo_ws[:,1][::skip][i], storm_centers_awo[:,1][::skip][i]+1]
 
-    x_bt = [earl_bt_data.lons[::8][3:10][i], storm_centers_awo[:,0][::skip][i]+1]
-    y_bt = [earl_bt_data.lats[::8][3:10][i], storm_centers_awo[:,1][::skip][i]+1]
+    # print(storm_centers_awo[:,0][::skip])
+    x_bt = [earl_bt_data.lons[::8][3:10][i][0], storm_centers_awo[:,0][::skip][i]+1]
+    y_bt = [earl_bt_data.lats[::8][3:10][i][0], storm_centers_awo[:,1][::skip][i]+1]
     ax1.plot(x_awo, y_awo, 'red', linestyle="-", lw=lw)
     ax1.plot(x_awo_ws, y_awo_ws, 'cyan', linestyle="-", lw=lw)
-    # ax1.plot(x_bt, y_bt, 'k', linestyle="-", lw=0.75) #Needs to be corrected
+    # print(x_bt)
+    ax1.plot(x_bt, y_bt, 'k', linestyle="-", lw=0.75) #Needs to be corrected
 
 #Legend
 # Track_Legend(axis, fontsize, markersize, xlocator, ylocator, loc)
-Track_Legend(ax1, 5, 5, 0.85, 0.65, 'center')
+Track_Legend_v2(ax1, 5, 5, 0.88, 0.85, 'center')
+# plt.legend(loc='upper left', prop = {"size": 5}, frameon=True, fancybox=True, shadow=True)
 add_corner_label(ax1, '(a)')
 
 
@@ -179,5 +184,5 @@ ax2.legend(loc='lower right', prop = {"size": 5}, frameon=True, fancybox=True, s
 ax2.grid(linestyle=':')
 
 
-plt.savefig(PNG + 'track_wspd_intensity.png', dpi=300, bbox_inches='tight',
+plt.savefig(PNG2 + 'track_wspd_intensity.png', dpi=300, bbox_inches='tight',
                 facecolor='w', transparent=False)

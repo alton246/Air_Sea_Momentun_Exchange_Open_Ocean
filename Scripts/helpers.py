@@ -387,6 +387,15 @@ def Track_Legend(axis, fontsize, markersize, xlocator, ylocator, loc):
                         prop = { "size": fontsize }, bbox_to_anchor=(xlocator, ylocator),
                         frameon=True, fancybox=True, shadow=True, loc=loc)
         
+def Track_Legend_v2(axis, fontsize, markersize, xlocator, ylocator, loc):
+        #Handles for legend
+        bt = mlines.Line2D([], [], color='black', marker='s', markersize=markersize, ls='solid', label='best track')
+        awo = mlines.Line2D([], [], color='red', marker='o', markersize=markersize, ls='solid', label='$AWO$-$CTL$')
+        awo_ws = mlines.Line2D([], [], color='cyan', marker='*', markersize=markersize,ls='solid', label='$AWO_{ws}$-$EXP$')
+        axis.legend(handles=[bt, awo_ws, awo], 
+                        prop = { "size": fontsize }, bbox_to_anchor=(xlocator, ylocator),
+                        frameon=True, fancybox=True, shadow=True, loc=loc)
+        
 def add_corner_label(ax, text, fontsize):
     ax.text(0.03, 0.92, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
 
@@ -423,4 +432,4 @@ def add_axis_labels(axis, fontsize, labelpad, labelsize, xticks, yticks):
     axis.tick_params(axis='both', which='major', labelsize=labelsize, length=1, width=1, pad=0.5)
 
 def add_corner_label(ax, text, fontsize=9):
-    ax.text(0.03, 0.88, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
+    ax.text(0.03, 0.84, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
