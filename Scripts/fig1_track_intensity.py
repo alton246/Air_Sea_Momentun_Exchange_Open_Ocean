@@ -184,5 +184,5 @@ ax2.legend(loc='lower right', prop = {"size": 5}, frameon=True, fancybox=True, s
 ax2.grid(linestyle=':')
 
 
-plt.savefig(PNG2 + 'track_wspd_intensity.png', dpi=300, bbox_inches='tight',
+plt.savefig(PNG + 'track_wspd_intensity.png', dpi=300, bbox_inches='tight',
                 facecolor='w', transparent=False)
