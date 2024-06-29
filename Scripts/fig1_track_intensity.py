@@ -155,7 +155,7 @@ for i in range(len(track_awo.time[::skip])):
 # Track_Legend(axis, fontsize, markersize, xlocator, ylocator, loc)
 Track_Legend_v2(ax1, 5, 5, 0.88, 0.85, 'center')
 # plt.legend(loc='upper left', prop = {"size": 5}, frameon=True, fancybox=True, shadow=True)
-add_corner_label(ax1, '(a)')
+add_corner_label(ax1, 0.84, '(a)')
 
 
 # Intensisty
@@ -173,7 +173,7 @@ ax2.set_xlim([track_awo.time[::mod_skip][awo_start_date_index],
 # ax2.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d")) #Date Format
 ax2.set_ylabel('Wind Speed (m/s)', fontsize=fontlabel_size)
 ax2.set_xlabel('Date (mm-dd)', fontsize=fontlabel_size)
-add_corner_label(ax2, '(b)')
+add_corner_label(ax2, 0.84, '(b)')
 ax2.set_yticks(ticks=wind_yticks)
 ax2.set_xticks(ticks = track_awo.time[::24])
 ax2.set_ylim([15, 70] ) #Minimum and Max x values 
