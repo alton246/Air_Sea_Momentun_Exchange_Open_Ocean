@@ -97,6 +97,7 @@ def make_wind_radii_obj(input_array):
         i += 4
     return wind_radii_obj
 
+
 def make_wind_coords_obj(input_array):
     header = ['NE', 'SE', 'SW', 'NW']
     wind_coords = {}
@@ -124,7 +125,7 @@ def plain2datetime(timeStr):
     a time string in form YYYYMMDDhh.
     """
     YYYY = timeStr[0:4]
-    print(YYYY)
+    # print(YYYY)
     MM = timeStr[4:6]
     DD = timeStr[6:8]
     hh = timeStr[8:10]
@@ -185,6 +186,23 @@ def latlon2xyStormRelative(lon,lat,lon0,lat0,dir=0.5*np.pi):
     y = X*np.cos(dir)+Y*np.sin(dir)
     return x,y
 
+<<<<<<< HEAD
+=======
+def extract_Storm_centers_over_period_time(date_of_int, track_data):
+    storm_centers = np.zeros((len(date_of_int),2), dtype=float)
+    for i in range(len(date_of_int)):
+        lats_lons_awo = getStormCenter(date_of_int[i], track_data)
+        storm_centers[i,0] = lats_lons_awo[0]
+        storm_centers[i,1] = lats_lons_awo[1]
+
+    return storm_centers
+
+def Rotate_U_V_Vector_Comp(u, v, storm_dir):
+    u_rot = u*np.cos(storm_dir-(np.pi/2)) + v*np.sin(storm_dir-(np.pi/2))
+    v_rot = -u*np.sin(storm_dir-(np.pi/2)) + v*np.cos(storm_dir-(np.pi/2)) 
+
+    return u_rot, v_rot
+>>>>>>> dev
 def counter(PATH, track_file, Storm_Name, Year):
     #File Reader
     with open(PATH+ track_file) as file:
@@ -491,6 +509,11 @@ def add_axis_labels(axis, fontsize, labelpad, labelsize, xticks, yticks):
     axis.set_yticks(ticks=yticks)
     axis.tick_params(axis='both', which='major', labelsize=labelsize, length=1, width=1, pad=0.5)
 
+<<<<<<< HEAD
 def add_corner_label(ax, text, fontsize=9):
     ax.text(0.03, 0.84, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
+=======
+def add_corner_label(ax, y_pos, text, fontsize=9):
+    ax.text(0.03, y_pos, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
+>>>>>>> dev
 
