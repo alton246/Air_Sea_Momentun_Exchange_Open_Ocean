@@ -186,8 +186,6 @@ def latlon2xyStormRelative(lon,lat,lon0,lat0,dir=0.5*np.pi):
     y = X*np.cos(dir)+Y*np.sin(dir)
     return x,y
 
-<<<<<<< HEAD
-=======
 def extract_Storm_centers_over_period_time(date_of_int, track_data):
     storm_centers = np.zeros((len(date_of_int),2), dtype=float)
     for i in range(len(date_of_int)):
@@ -202,7 +200,6 @@ def Rotate_U_V_Vector_Comp(u, v, storm_dir):
     v_rot = -u*np.sin(storm_dir-(np.pi/2)) + v*np.cos(storm_dir-(np.pi/2)) 
 
     return u_rot, v_rot
->>>>>>> dev
 def counter(PATH, track_file, Storm_Name, Year):
     #File Reader
     with open(PATH+ track_file) as file:
@@ -509,11 +506,6 @@ def add_axis_labels(axis, fontsize, labelpad, labelsize, xticks, yticks):
     axis.set_yticks(ticks=yticks)
     axis.tick_params(axis='both', which='major', labelsize=labelsize, length=1, width=1, pad=0.5)
 
-<<<<<<< HEAD
-def add_corner_label(ax, text, fontsize=9):
-    ax.text(0.03, 0.84, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
-=======
 def add_corner_label(ax, y_pos, text, fontsize=9):
     ax.text(0.03, y_pos, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
->>>>>>> dev
 
