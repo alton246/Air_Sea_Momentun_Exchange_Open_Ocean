@@ -508,4 +508,3 @@ def add_axis_labels(axis, fontsize, labelpad, labelsize, xticks, yticks):
 
 def add_corner_label(ax, x_pos, y_pos, text, fontsize=9):
     ax.text(x_pos, y_pos, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
-

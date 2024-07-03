@@ -57,6 +57,10 @@ ax1 = plt.subplot2grid(gridsize, (0, 0), colspan=1, rowspan=1)
 awo_wspd = ax1.contourf(data['x'], data['y'], data['wspd_awo_qc'][0], 
                         levels=wspd_levels, cmap=wspd_cmaps, extend='both')
 
+CS = ax1.contour(data['x'], data['y'],data['wspd_awo_ws_qc'][0], [17], linewidths=0.5, colors='white')
+ax1.clabel(CS, inline=True, fontsize=5)
+
+
 hcb = fig.colorbar(awo_wspd, shrink=shrink, aspect=aspect, ax=ax1, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=labelsize, pad=0.002)
 
@@ -71,6 +75,9 @@ ax2 = plt.subplot2grid(gridsize, (0, 1), colspan=1, rowspan=1)
 
 awo_ws_wspd = ax2.contourf(data['x'], data['y'],data['wspd_awo_ws_qc'][0], 
                         levels=wspd_levels, cmap=wspd_cmaps, extend='both')
+
+CS = ax2.contour(data['x'], data['y'],data['wspd_awo_ws_qc'][0], [17], linewidths=0.5, colors='white')
+ax2.clabel(CS, inline=True, fontsize=5)
 
 hcb = fig.colorbar(awo_ws_wspd, shrink=shrink, aspect=aspect, ax=ax2, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=labelsize, pad=0.002)
