@@ -7,7 +7,7 @@ from helpers import *
 
 PATH = '/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentum_Exchange_TC_Coast/Notebooks/Figure2/'
 PNG='/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
-file = 'storm_relative_data.2010090100-2010090105.nc'
+file = 'storm_relative_qualit_controlled_data.2010090106_2010090111.nc'
 
 data = xr.open_mfdataset(PATH + file)
 
@@ -65,7 +65,7 @@ hcb = fig.colorbar(awo_wspd, shrink=shrink, aspect=aspect, ax=ax1, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=labelsize, pad=0.002)
 
 add_storm_relative_essentials(ax1)
-add_axis_labels(ax1, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax1, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax1, x_pos, y_pos, '(a)', fontsize=fontsize)
 ax1.set_title('$AWO$-$CTL$ $U_{10}$ ($m/s$)', fontsize=fontsize, pad=1)
 ax1.set_aspect('equal')
@@ -84,7 +84,7 @@ hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=labelsize, pad=0.00
 
 add_storm_relative_essentials(ax2)
 # add_axis_labels(axis, fontsize, labelpad, labelsize, xticks, yticks):
-add_axis_labels(ax2, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax2, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax2, x_pos, y_pos, '(b)', fontsize=fontsize)
 ax2.set_title('$AWO_{ws}$-$EXP$ $U_{10}$ ($m/s$)', fontsize=fontsize, pad=1)
 ax2.set_aspect('equal')
@@ -101,7 +101,7 @@ hcb = fig.colorbar(wspd_awo_awo_ws, shrink=shrink, aspect=aspect, ax=ax3, pad=0.
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=labelsize, pad=0.002)
 
 add_storm_relative_essentials(ax3)
-add_axis_labels(ax3, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax3, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax3, x_pos, y_pos, '(c)', fontsize=fontsize)
 ax3.set_title('$AWO$-$CTL$ - $AWO_{ws}$-$EXP$ $U_{10}}$ ($m/s$)', fontsize=fontsize, pad=1)
 ax3.set_aspect('equal')
@@ -118,7 +118,7 @@ hcb = fig.colorbar(awo_swh, shrink=shrink, aspect=aspect, ax=ax4, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
 
 add_storm_relative_essentials(ax4)
-add_axis_labels(ax4, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax4, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax4, x_pos, y_pos, '(d)', fontsize=fontsize)
 
 ax4.set_title('$AWO$-$CTL$ $H_{s}}$ ($m$)', fontsize=fontsize, pad=1)
@@ -134,7 +134,7 @@ hcb = fig.colorbar(awo_ws_swh, shrink=shrink, aspect=aspect, ax=ax5, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
 
 add_storm_relative_essentials(ax5)
-add_axis_labels(ax5, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax5, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax5, x_pos, y_pos, '(e)', fontsize=fontsize)
 ax5.set_title('$AWO_{ws}$-$EXP$ $H_{s}$ ($m$)', fontsize=fontsize, pad=1)
 ax5.set_aspect('equal')
@@ -151,7 +151,7 @@ hcb = fig.colorbar(swh_awo_awo_ws, shrink=shrink, aspect=aspect, ax=ax6, pad=0.0
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
 
 add_storm_relative_essentials(ax6)
-add_axis_labels(ax6, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax6, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax6, x_pos, y_pos, '(f)', fontsize=fontsize)
 ax6.set_title('$AWO$-$CTL$ - $AWO_{ws}$-$EXP$ $H_{s}$ ($m$)', fontsize=fontsize, pad=1)
 ax6.set_aspect('equal')
@@ -160,101 +160,101 @@ ax6.set_aspect('equal')
 #AWO
 ax7 = plt.subplot2grid(gridsize, (2, 0), colspan=1, rowspan=1)
 
-awo_temp = ax7.contourf(data['x'], data['y'], data['sst_awo_qc'][0], 
-                        cmap=sst_cmap,levels=sst_levels, extend='both')
+awo_sfc = ax7.contourf(data['x'], data['y'], data['sfc_awo_qc'][0], 
+                        cmap=sfc_cmap,levels=sfc_levels, extend='max')
 
-hcb = fig.colorbar(awo_temp, shrink=shrink, aspect=aspect, ax=ax7, pad=0.02)
+hcb = fig.colorbar(awo_sfc, shrink=shrink, aspect=aspect, ax=ax7, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
 
 add_storm_relative_essentials(ax7)
-add_axis_labels(ax7, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax7, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax7, x_pos, y_pos, '(g)', fontsize=fontsize)
-ax7.set_title('$AWO$-$CTL$ $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
+ax7.set_title('$AWO$-$CTL$ $U$ ($m/s$)', fontsize=fontsize, pad=1)
 ax7.set_aspect('equal')
 
 #AWO_ws
 ax8 = plt.subplot2grid(gridsize, (2, 1), colspan=1, rowspan=1)
 
-awo_ws_temp = ax8.contourf(data['x'], data['y'], data['sst_awo_ws_qc'][0], 
-                        cmap=sst_cmap,levels=sst_levels, extend='both')
+awo_ws_sfc = ax8.contourf(data['x'], data['y'], data['sfc_awo_ws_qc'][0], 
+                        cmap=sfc_cmap,levels=sfc_levels, extend='max')
 
 
-hcb = fig.colorbar(awo_ws_temp, shrink=shrink, aspect=aspect, ax=ax8, pad=0.02)
+hcb = fig.colorbar(awo_ws_sfc, shrink=shrink, aspect=aspect, ax=ax8, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
 
 add_storm_relative_essentials(ax8)
-add_axis_labels(ax8, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax8, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax8, x_pos, y_pos, '(h)', fontsize=fontsize)
-ax8.set_title('$AWO_{ws}$-$EXP$ $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
+ax8.set_title('$AWO_{ws}$-$EXP$ $U$ ($m/s$)', fontsize=fontsize, pad=1)
 ax8.set_aspect('equal')
 
 #Diff
 ax9 = plt.subplot2grid(gridsize, (2, 2), colspan=1, rowspan=1)
 
-temp_awo_awo_ws = ax9.contourf(data['x'], data['y'], data['sst_awo_qc'][0] - data['sst_awo_ws_qc'][0], 
-                        cmap=diff_cmap, levels=sst_diff_levels, extend='both')
+temp_awo_awo_ws = ax9.contourf(data['x'], data['y'], data['sfc_awo_qc'][0] - data['sfc_awo_ws_qc'][0], 
+                        cmap=diff_cmap, levels=sfc_diff_levels, extend='both')
 
 
 hcb = fig.colorbar(temp_awo_awo_ws, shrink=shrink, aspect=aspect, ax=ax9, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
 
 add_storm_relative_essentials(ax9)
-add_axis_labels(ax9, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax9, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax9, x_pos, y_pos, '(i)', fontsize=fontsize)
-ax9.set_title('$AWO$-$CTL$ - $AWO_{ws}$-$EXP$ $T$ ($^{\circ} C$)', fontsize=fontsize, pad=1)
+ax9.set_title('$AWO$-$CTL$ - $AWO_{ws}$-$EXP$ $U$ ($m/s$)', fontsize=fontsize, pad=1)
 ax9.set_aspect('equal')
 
 #Surface Currents
 #AWO
 ax10 = plt.subplot2grid(gridsize, (3, 0), colspan=1, rowspan=1)
 
-awo_sfc = ax10.contourf(data['x'], data['y'], data['sfc_awo_qc'][0], 
-                         levels=sfc_levels, cmap=sfc_cmap, extend='max', zorder=zorder)
+awo_sst = ax10.contourf(data['x'], data['y'], data['sst_awo_qc'][0], 
+                         levels=sst_levels, cmap=sst_cmap, extend='both', zorder=zorder)
 
 
-hcb = fig.colorbar(awo_sfc, shrink=shrink, aspect=aspect, ax=ax10, pad=0.02)
+hcb = fig.colorbar(awo_sst, shrink=shrink, aspect=aspect, ax=ax10, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
 
 add_storm_relative_essentials(ax10)
-add_axis_labels(ax10, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax10, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax10, x_pos, y_pos, '(j)', fontsize=fontsize)
-ax10.set_title('$AWO$-$CTL$ $U$ ($m/s$)', fontsize=fontsize, pad=1)
+ax10.set_title('$AWO$-$CTL$ $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
 ax10.set_aspect('equal')
 
 
 #AWO_ws
 ax11 = plt.subplot2grid(gridsize, (3, 1), colspan=1, rowspan=1)
 
-awo_ws_sfc = ax11.contourf(data['x'], data['y'], data['sfc_awo_ws_qc'][0], 
-                        levels=sfc_levels, cmap=sfc_cmap, extend='max')
+awo_ws_sst = ax11.contourf(data['x'], data['y'], data['sst_awo_ws_qc'][0], 
+                        levels=sst_levels, cmap=sst_cmap, extend='both')
 
-hcb = fig.colorbar(awo_ws_sfc, shrink=shrink, aspect=aspect, ax=ax11, pad=0.02)
+hcb = fig.colorbar(awo_ws_sst, shrink=shrink, aspect=aspect, ax=ax11, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
 
 add_storm_relative_essentials(ax11)
-add_axis_labels(ax11, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax11, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax11, x_pos, y_pos, '(k)', fontsize=fontsize)
-ax11.set_title('$AWO_{ws}$-$EXP$ $U}$ ($m/s$)', fontsize=fontsize, pad=1)
+ax11.set_title('$AWO_{ws}$-$EXP$ $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
 ax11.set_aspect('equal')
 
 # Diff
 ax12 = plt.subplot2grid(gridsize, (3, 2), colspan=1, rowspan=1)
 
-sfc_awo_awo_ws = ax12.contourf(data['x'], data['y'], data['sfc_awo_qc'][0] - data['sfc_awo_ws_qc'][0], 
+sst_awo_awo_ws = ax12.contourf(data['x'], data['y'], data['sst_awo_qc'][0] - data['sst_awo_ws_qc'][0], 
                          levels=sfc_diff_levels, cmap=diff_cmap, extend='both', zorder=zorder)
 
-hcb = fig.colorbar(sfc_awo_awo_ws, shrink=shrink, aspect=aspect, ax=ax12, pad=0.02)
+hcb = fig.colorbar(sst_awo_awo_ws, shrink=shrink, aspect=aspect, ax=ax12, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
 
 add_storm_relative_essentials(ax12)
-add_axis_labels(ax12, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
+add_storm_relative_axis_labels(ax12, fontsize, labelpad, labelsize, ticks[::2], ticks[::2])
 add_corner_label(ax12, x_pos, y_pos, '(l)', fontsize=fontsize)
-ax12.set_title('$AWO$-$CTL$ - $AWO_{ws}$-$EXP$ $U$ ($m/s$)', fontsize=fontsize, pad=1)
+ax12.set_title('$AWO$-$CTL$ - $AWO_{ws}$-$EXP$ $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
 ax12.set_aspect('equal')
 
 
 
 fig.tight_layout(pad=0.025, w_pad=0.025, h_pad=0.0025)
 
-plt.savefig(PNG + 'storm_relative_average_wspd_swh_sst_sfc.py.png', dpi=300, bbox_inches='tight',
+plt.savefig(PNG + 'storm_relative_average_wspd_swh_sst_sfc.png', dpi=300, bbox_inches='tight',
                 facecolor='w', transparent=False)

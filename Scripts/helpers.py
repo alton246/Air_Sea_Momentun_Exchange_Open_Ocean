@@ -499,7 +499,14 @@ def cross_section_essential(x_pos, y_pos, fontsize, lw):
     plt.text(x_pos,y_pos, 'R', fontweight='bold', fontsize=fontsize)
     plt.text(-1 * x_pos,y_pos, 'L', fontweight='bold', fontsize=fontsize)
 
-def add_axis_labels(axis, fontsize, labelpad, labelsize, xticks, yticks):
+def add_storm_relative_axis_labels(axis, fontsize, labelpad, labelsize, xticks, yticks):
+    axis.set_ylabel('Distance to Storm Center (km)', fontsize=fontsize, labelpad=labelpad)
+    axis.set_xlabel('Distance to Storm Center (km)', fontsize=fontsize, labelpad=labelpad)
+    axis.set_xticks(ticks=xticks)
+    axis.set_yticks(ticks=yticks)
+    axis.tick_params(axis='both', which='major', labelsize=labelsize, length=1, width=1, pad=0.5)
+
+def add_vertical_cross_section_axis_labels(axis, fontsize, labelpad, labelsize, xticks, yticks):
     axis.set_ylabel('Depth (m)', fontsize=fontsize, labelpad=labelpad)
     axis.set_xlabel('Distance to Storm Center (km)', fontsize=fontsize, labelpad=labelpad)
     axis.set_xticks(ticks=xticks)
