@@ -5,7 +5,7 @@ import cmaps
 from helpers import *
 
 #Setting PATH of data and 
-PATH = '/home/orca/bkerns/projects/alton_storm_relative/'
+PATH = '/home/disk/orca/adaley17/Research/Stress_Separation/Hurricane_Earl/Notebooks/SST_Analysis/Composites/Data_Currents_Zlevels/'
 PNG='/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
 
 
@@ -27,6 +27,7 @@ awo_ws_curr = np.sqrt(ds_timemean_slice['u-vel_interp_awo_ws']**2 + ds_timemean_
 curr_levels = np.arange(0,2.10,0.10)
 sst_levels=np.arange(25, 30.25, 0.25)
 diff_levels=np.arange(-0.2,0.25,0.05)
+sst_diff_levels = np.arange(-0.6, 0.7, 0.1)
 
 #Colorbar Options
 size=0.25
@@ -69,7 +70,7 @@ ax1.set_aspect('equal')
 ax1.set_xlim([-100,100])
 ax1.set_ylim([100,1])
 cross_section_essential(30, 90, 10, 0.5)
-add_axis_labels(ax1, fontsize, labelpad, labelsize, xticks[::2], yticks)
+add_vertical_cross_section_axis_labels(ax1, fontsize, labelpad, labelsize, xticks[::2], yticks)
 ax1.set_title('$AWO$-$CTL$  $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
 
 add_corner_label(ax1, x_pos, y_pos,'(a)', fontsize)
@@ -88,7 +89,7 @@ ax2.set_aspect('equal')
 ax2.set_xlim([-100,100])
 ax2.set_ylim([100,1])
 cross_section_essential(30, 90, 10, 0.5)
-add_axis_labels(ax2, fontsize, labelpad, labelsize, xticks[::2], yticks)
+add_vertical_cross_section_axis_labels(ax2, fontsize, labelpad, labelsize, xticks[::2], yticks)
 ax2.set_title(' $AWO_{ws}$-$EXP$ $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
 
 add_corner_label(ax2, x_pos, y_pos,'(b)', fontsize)
@@ -98,7 +99,7 @@ ax3 = plt.subplot2grid(gridsize, (0, 2), colspan=1, rowspan=1)
 # ax3.pcolormesh(awo_X, awo_Y, awo_vcross_data['curr_speed'][0] - awo_ws_vcross_data['curr_speed'][0],
 #                   vmin=-0.5, vmax=0.5, cmap=cmaps.MPL_bwr, rasterized=True)
 temp_diff_diff = ax3.contourf(X, Y, awo_temp - awo_ws_temp,
-                  levels=diff_levels, extend='both', cmap=cmaps.MPL_bwr)
+                  levels=sst_diff_levels, extend='both', cmap=cmaps.MPL_bwr)
 
 # plt.clabel(temp_diff, inline = True, 
 #            fontsize=fontsize, fmt='%1.2f', colors = 'k')
@@ -112,7 +113,7 @@ ax3.set_aspect('equal')
 ax3.set_xlim([-100,100])
 ax3.set_ylim([100,1]) # Limits
 cross_section_essential(30, 75, 10, 0.5)
-add_axis_labels(ax3, fontsize, labelpad, labelsize, xticks[::2], yticks)
+add_vertical_cross_section_axis_labels(ax3, fontsize, labelpad, labelsize, xticks[::2], yticks)
 ax3.set_aspect('equal')
 
 ax3.set_title('$AWO$-$CTL$ $ - $ $AWO_{ws}$-$EXP$ $T$ ($^{\circ}C$)', loc='center', fontsize=fontsize, pad=1)
@@ -128,7 +129,7 @@ hcb = fig.colorbar(curr_awo,shrink=shrink, aspect=10, ax=ax4, pad=0.02)
 hcb.ax.tick_params(color='k', length=2.0, width=1.0, labelsize=5, pad=0.002)
 
 cross_section_essential(30, 75, 10, 0.5)
-add_axis_labels(ax4, fontsize, labelpad, labelsize, xticks[::2], yticks)
+add_vertical_cross_section_axis_labels(ax4, fontsize, labelpad, labelsize, xticks[::2], yticks)
 ax4.set_xlim([-100,100])
 ax4.set_ylim([100,0]) # Limits
 ax4.set_aspect('equal')
@@ -148,7 +149,7 @@ hcb = fig.colorbar(curr_awo_ws,shrink=shrink, aspect=10, ax=ax5, pad=0.02)
 hcb.ax.tick_params(color='k', length=2.0, width=1.0, labelsize=5, pad=0.002)
 
 cross_section_essential(30, 75, 10, 0.5)
-add_axis_labels(ax5, fontsize, labelpad, labelsize, xticks[::2], yticks)
+add_vertical_cross_section_axis_labels(ax5, fontsize, labelpad, labelsize, xticks[::2], yticks)
 
 ax5.set_aspect('equal')
 ax5.set_ylim([100,0]) # Limits
@@ -173,7 +174,7 @@ hcb.ax.tick_params(color='k', length=2.0, width=1.0, labelsize=5, pad=0.002)
 #             c='k', s=size,edgecolors='k', label='$AWO_{ws}$-$EXP$')
 
 cross_section_essential(30, 75, 10, 0.5)
-add_axis_labels(ax6, fontsize, labelpad, labelsize, xticks[::2], yticks)
+add_vertical_cross_section_axis_labels(ax6, fontsize, labelpad, labelsize, xticks[::2], yticks)
 
 ax6.set_aspect('equal')
 ax6.set_xlim([-100,100])
@@ -184,5 +185,5 @@ add_corner_label(ax6, x_pos, y_pos,'(f)', fontsize)
 
 fig.tight_layout(pad=0.5, w_pad=0.5, h_pad=-8)
 
-plt.savefig(PNG +'fig4_vert_cross_sfc_temp.png', dpi=300, bbox_inches='tight',
+plt.savefig(PNG +'fig4_vert_cross_sfc_temp_2010090100-2010090105.png', dpi=300, bbox_inches='tight',
                 facecolor='w', transparent=False)
