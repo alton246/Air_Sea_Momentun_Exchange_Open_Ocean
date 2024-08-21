@@ -516,5 +516,13 @@ def add_vertical_cross_section_axis_labels(axis, fontsize, labelpad, labelsize, 
 def add_corner_label(ax, x_pos, y_pos, text, fontsize):
     ax.text(x_pos, y_pos, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
 
+def get_mixed_layer_depth(temp_data, mld_data, Y_vals):
+    for ii in range(len(mld_data)):
+            for kk in range(11,500): # MLD not likely deeper than 500 m.
+                  tdiff = temp_data[kk,ii] - temp_data[10,ii]
+                  if tdiff < -0.5:
+                        break
+            mld_data[ii] = Y_vals[kk]
+    return mld_data;
 # Old fontsize =9
 
