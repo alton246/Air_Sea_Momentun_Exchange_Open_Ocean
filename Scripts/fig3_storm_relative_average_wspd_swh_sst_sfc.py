@@ -50,6 +50,7 @@ shrink = 0.95
 gridsize = (4, 3)
 fig = plt.figure(figsize=(4, 4))
 
+x_reshape, y_reshpae = np.meshgrid(data['x'], data['y'])
 
 # AWO 
 ax1 = plt.subplot2grid(gridsize, (0, 0), colspan=1, rowspan=1)
@@ -194,6 +195,9 @@ ax9 = plt.subplot2grid(gridsize, (2, 2), colspan=1, rowspan=1)
 temp_awo_awo_ws = ax9.contourf(data['x'], data['y'], data['sfc_awo_qc'][0] - data['sfc_awo_ws_qc'][0], 
                         cmap=diff_cmap, levels=sfc_diff_levels, extend='both')
 
+CS = ax9.contour(x_reshape, y_reshpae, data['sst_awo_ws_qc'][0], [28.5], linewidths=0.5, colors='magenta')
+# ax9.axhline(y=-98, xmin=-50, xmax=50, color='yellow', linestyle='-')
+ax9.plot((-100, 100), (-100, -100), color='yellow', linestyle='-') 
 
 hcb = fig.colorbar(temp_awo_awo_ws, shrink=shrink, aspect=aspect, ax=ax9, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
@@ -210,6 +214,7 @@ ax10 = plt.subplot2grid(gridsize, (3, 0), colspan=1, rowspan=1)
 
 awo_sst = ax10.contourf(data['x'], data['y'], data['sst_awo_qc'][0], 
                          levels=sst_levels, cmap=sst_cmap, extend='both', zorder=zorder)
+CS = ax10.contour(x_reshape, y_reshpae, data['sst_awo_ws_qc'][0], [28.5], linewidths=0.5, colors='magenta')
 
 
 hcb = fig.colorbar(awo_sst, shrink=shrink, aspect=aspect, ax=ax10, pad=0.02)
@@ -227,6 +232,7 @@ ax11 = plt.subplot2grid(gridsize, (3, 1), colspan=1, rowspan=1)
 
 awo_ws_sst = ax11.contourf(data['x'], data['y'], data['sst_awo_ws_qc'][0], 
                         levels=sst_levels, cmap=sst_cmap, extend='both')
+CS = ax11.contour(x_reshape, y_reshpae, data['sst_awo_ws_qc'][0], [28.5], linewidths=0.5, colors='magenta')
 
 hcb = fig.colorbar(awo_ws_sst, shrink=shrink, aspect=aspect, ax=ax11, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
@@ -243,6 +249,12 @@ ax12 = plt.subplot2grid(gridsize, (3, 2), colspan=1, rowspan=1)
 sst_awo_awo_ws = ax12.contourf(data['x'], data['y'], data['sst_awo_qc'][0] - data['sst_awo_ws_qc'][0], 
                          levels=sfc_diff_levels, cmap=diff_cmap, extend='both', zorder=zorder)
 
+# print(np.nanmax(data['sst_awo_qc'][0] - data['wspd_awo_ws_qc'][0]))
+
+# CS = ax12.contour(x_reshape, y_reshpae, data['sst_awo_qc'][0] - data['sst_awo_ws_qc'][0], [0.20], linewidths=0.5, colors='yellow')
+CS = ax12.contour(x_reshape, y_reshpae, data['sst_awo_ws_qc'][0], [28.5], linewidths=0.5, colors='magenta')
+ax12.plot((-100, 100), (-100, -100), color='yellow', linestyle='-') 
+
 hcb = fig.colorbar(sst_awo_awo_ws, shrink=shrink, aspect=aspect, ax=ax12, pad=0.02)
 hcb.ax.tick_params(color='k', length=1, width=0.5, labelsize=4, pad=0.002)
 
@@ -251,8 +263,6 @@ add_storm_relative_axis_labels(ax12, fontsize, labelpad, labelsize, ticks[::2], 
 add_corner_label(ax12, x_pos, y_pos, '(l)', fontsize=fontsize)
 ax12.set_title('$AWO$-$CTL$ - $AWO_{ws}$-$EXP$ $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
 ax12.set_aspect('equal')
-
-
 
 fig.tight_layout(pad=0.025, w_pad=0.025, h_pad=0.0025)
 
