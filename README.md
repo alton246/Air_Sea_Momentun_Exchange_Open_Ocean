@@ -1,1 +1,5 @@
-These scripts were used to generate the figures for Daley and Chen 2024
+Alton Daley adaley17@uw.edu
+
+This repository contains the plotting scripts for the publications based on Hurricane Earl 2010.
+
+
