@@ -3,6 +3,7 @@ import pandas as pd
 import datetime
 import csv
 import matplotlib.pyplot as plt
+import math
 
 from matplotlib.dates import num2date,date2num
 import matplotlib.ticker as mticker
@@ -394,36 +395,6 @@ def Cartopy_Features(axis, fontsize, plot_area, xlocator, ylocator, linecolor):
         gl.xpadding = 0.5
         gl.ypadding = 0.5
 
-
-# def Cartopy_Features(axis, fontsize, plot_area, xlocator, ylocator):
-#         """Plot area is a list in the form 
-#         [max_lon_track + 360.0, min_lon_track + 360.0, min_lat_track,max_lat_track]
-#         """
-#         #Setting coast, lakes and projection
-#         coast = cfeature.GSHHSFeature(scale='high', levels=[1,], edgecolor='k')
-#         lakes = cfeature.GSHHSFeature(scale='high', levels=[2,], edgecolor='face',facecolor='grey')
-#         axis.add_feature(cfeature.LAND, color='white')
-#         axis.add_feature(coast)
-#         axis.add_feature(lakes)
-#         axis.add_feature(cfeature.BORDERS, linewidth=0.75)
-#         # ax1.add_feature(cfeature.OCEAN)
-#         states_provinces = cfeature.NaturalEarthFeature(
-#                 category='cultural',
-#                 name='admin_1_states_provinces_lines',
-#                 scale='110m')
-#         axis.add_feature(states_provinces, linewidth=0.75)
-#         axis.set_extent(plot_area, crs=ccrs.PlateCarree())
-
-#         gl = axis.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
-#                         linewidth=0.5, color='k', alpha=0.7, linestyle='--')
-#         gl.top_labels = False
-#         gl.right_labels = False
-#         # gl.bottom_labels = False
-#         gl.xlocator = mticker.FixedLocator(np.arange(-180, 180,xlocator))
-#         gl.ylocator = mticker.FixedLocator(np.arange(-90, 90, ylocator))
-#         gl.xlabel_style = {'size': fontsize, 'color': 'black'}
-#         gl.ylabel_style = {'size': fontsize, 'color': 'black'}
-
 def Track_Legend(axis, fontsize, markersize, xlocator, ylocator, loc):
         #Handles for legend
         ts = mlines.Line2D([], [], color='yellow', marker='o', markersize=markersize, ls='', label='tropical strom')
@@ -525,4 +496,133 @@ def get_mixed_layer_depth(temp_data, mld_data, Y_vals):
             mld_data[ii] = Y_vals[kk]
     return mld_data;
 # Old fontsize =9
+
+def extract_data_ahead_of_storm(data1, data2, n):
+    data_diff = data1 - data2
+
+    #Empty list to store data after removing nans
+    cleaned_data = []
+
+    #Empty list to store all the median values for each time step
+    median_of_data = create_nan_list(n) 
+
+    for i in range(n):
+        # print(i)
+        data_diff_qc = xr.where(data_diff[i].y > 0 , data_diff[i], np.nan)
+
+        #Converting data to list
+        data_with_nans = data_diff_qc.values.flatten().tolist()
+
+        #Removing all nans because whisker plots will not work with nans
+        data_qc = [value for value in data_with_nans if not math.isnan(value)]
+
+        #Computing and storing the median of each period
+        median_of_data[i] = np.nanmedian(data_qc)
+
+        #Combining all list into a single one
+        cleaned_data.append(data_qc)
+
+    return cleaned_data, median_of_data;
+
+def create_nan_list(num_nans):
+    return [float('nan')] * num_nans
+
+def extract_data_behind_of_storm(data1, data2, n):
+    data_diff = data1 - data2
+
+    #Empty list to store data after removing nans
+    cleaned_data = []
+
+    #Empty list to store all the median values for each time step
+    median_of_data = create_nan_list(n) 
+
+    for i in range(n):
+        # print(i)
+        data_diff_qc = xr.where(data_diff[i].y < 0 , data_diff[i], np.nan)
+
+        #Converting data to list
+        data_with_nans = data_diff_qc.values.flatten().tolist()
+
+        #Removing all nans because whisker plots will not work with nans
+        data_qc = [value for value in data_with_nans if not math.isnan(value)]
+
+        #Computing and storing the median of each period
+        median_of_data[i] = np.nanmedian(data_qc)
+
+        #Combining all list into a single one
+        cleaned_data.append(data_qc)
+
+    return cleaned_data, median_of_data;
+
+def generate_best_fit_line(x_data, y_data, polfit):
+    coeff = np.polyfit(x_data, y_data, polfit)
+    slope = coeff[0]
+    intercept = coeff[1]
+
+    bf_line = slope * x_data + intercept
+
+    return bf_line, slope, intercept;
+
+def extract_masked_data_of_interest(data1, data2, index_of_mask, n):
+
+    data_diff = data1 - data2
+    #Empty list to store data after removing nans
+    cleaned_data = []
+
+    #Empty list to store all the median values for each time step
+    median_of_data = create_nan_list(n) 
+
+    for i in range(8):
+        #Masking data
+        data_array = data_diff[i].to_masked_array()
+        data_array[index_of_mask] = np.nan
+        data_masked_qc = data_array.data
+
+        #Converting data to list
+        data_with_nans = data_masked_qc.flatten().tolist()
+
+        #Removing all nans because whisker plots will not work with nans
+        data_qc = [value for value in data_with_nans if not math.isnan(value)]
+
+        #Computing and storing the median of each period
+        median_of_data[i] = np.nanmedian(data_qc)
+
+        #Combining all list into a single one
+        cleaned_data.append(data_qc)
+
+        # print(median_of_data)
+
+    return cleaned_data, median_of_data;
+
+def add_axis_label_to_dub_axis_summary_plot(axis, twin_axis, ylabel1, ylabel2, fontsize, labelpad, labelsize, color1, color2, rotation, ymin, ymax, length, width):
+    axis.set_ylabel(ylabel1, fontsize=fontsize, labelpad=labelpad, color=color1)
+    twin_axis.set_ylabel(ylabel2, fontsize=fontsize, labelpad=labelpad, color=color2)
+    axis.set_xlabel('Date', fontsize=fontsize, labelpad=labelpad)
+    axis.set_ylim([ymin,ymax])
+    twin_axis.set_ylim([ymin,ymax])
+
+    axis.tick_params(axis='both', which='major', labelsize=labelsize)
+    axis.tick_params(axis='x', which='major', labelrotation=rotation)
+    axis.tick_params(axis='y', which='major', colors=color1)
+    twin_axis.tick_params(axis='y', which='major', colors=color2, labelsize=labelsize, length=length, width=width, pad=0.5)
+    axis.tick_params(axis='both', which='major', labelsize=labelsize, length=length, width=width, pad=0.5)
+
+def add_axis_label_to_single_axis_summary_plot(axis, ylabel, fontsize, labelpad, labelsize, rotation, ymin, ymax, length, width):
+    axis.set_ylabel(ylabel, fontsize=fontsize, labelpad=labelpad)
+    axis.set_xlabel('Date', fontsize=fontsize, labelpad=labelpad)
+    axis.set_ylim([ymin,ymax])
+    axis.tick_params(axis='both', which='major', labelsize=labelsize)
+    axis.tick_params(axis='x', which='major', labelrotation=rotation)
+    axis.tick_params(axis='both', which='major', labelsize=labelsize, length=length, width=width, pad=0.5)
+
+def add_legend_to_summary_plot(axis, color1, color2, label1, label2, loc, size):
+    swh_med= mlines.Line2D([], [], color=color2, ls='solid', label='$trend$')
+    wspd_med = mlines.Line2D([], [], color=color1, ls='solid', label='$trend$')
+    swh_fit= mlines.Line2D([], [], color=color1, markersize=1, marker='o', ls='', label=label1)
+    wspd_fit= mlines.Line2D([], [], color=color2, markersize=1, marker='o', ls='', label=label2)
+    best_fit = mlines.Line2D([], [], color='blue',ls='dashed', label='$y=0$')
+
+    axis.legend(handles=[swh_med, wspd_med, wspd_fit, swh_fit], 
+            ncol=2, loc=loc, prop = {"size": size}, frameon=True, fancybox=True, shadow=True)
+
 
