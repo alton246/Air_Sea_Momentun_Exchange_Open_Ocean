@@ -1,0 +1,11 @@
+cff-version: 1.1.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: Daley
+  given-names: Alton
+orcid: https://orcid.org/0000-0002-7458-2838
+title:Software Supporting "Air-Sea Momentum Exchange with Explicit Wind-Wave-Current Coupling and Effects on Hurricane Structure and Impacts"
+version: v0.1.0
+doi: 10.5281/zenodo.13840299
+date-released: 2024-09-25
+url : "https://doi.org/10.5281/zenodo.13840299"
