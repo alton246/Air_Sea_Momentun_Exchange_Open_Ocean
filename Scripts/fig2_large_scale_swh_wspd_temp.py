@@ -119,6 +119,7 @@ length=4
 
 skip=24
 labelsize=8
+x_pos=0.03
 y_pos=0.92
 
 #Wave Vector Components
@@ -174,8 +175,8 @@ hcb.ax.tick_params(color='k', length=3, width=1.5, labelsize=labelsize, pad=0.00
 
 
 Cartopy_Features(ax1, fontsize, plot_area, 2, 2, 'k')
-ax1.set_title('$AWO$-$CTL$ $H_{s}$ $(m)$', fontsize=fontsize, pad=1)
-add_corner_label(ax1, y_pos, '(a)')
+ax1.set_title('$CTL$ $H_{s}$ $(m)$', fontsize=fontsize, pad=1)
+add_corner_label(ax1, x_pos, y_pos, '(a)', fontsize)
 
 #AWO WSPD
 ax2 = plt.subplot2grid(gridsize, (1, 0), colspan=1, rowspan=1, projection=crs)
@@ -199,9 +200,9 @@ ax2.scatter(storm_centers_awo[:,0][::3][awo_swh_start_date_index:awo_swh_end_dat
             storm_centers_awo[:,1][::3][awo_swh_start_date_index:awo_swh_end_date_index], 
          linestyle='-', facecolors='white', edgecolors='k', marker='o', s=5)
 
-ax2.set_title('$AWO$-$CTL$ $U_{10}$ ($m/s$)', fontsize=fontsize, pad=1)
+ax2.set_title('$CTL$ $U_{10}$ ($m/s$)', fontsize=fontsize, pad=1)
 
-add_corner_label(ax2, y_pos, '(b)')
+add_corner_label(ax2, x_pos, y_pos, '(b)', fontsize)
 
 # AWO SST
 ax3 = plt.subplot2grid(gridsize, (2, 0), colspan=1, rowspan=1, projection=crs)
@@ -225,9 +226,9 @@ ax3.scatter(storm_centers_awo[:,0][::3][awo_swh_start_date_index:awo_swh_end_dat
          linestyle='-', facecolors='white', edgecolors='k', marker='o', s=5)
 
 Cartopy_Features(ax3, fontsize, plot_area, 2, 2, 'k')
-ax3.set_title('$AWO$-$CTL$ SST ($^{\circ}$C)', fontsize=fontsize, pad=1)
+ax3.set_title('$CTL$ SST ($^{\circ}$C)', fontsize=fontsize, pad=1)
 
-add_corner_label(ax3, y_pos, '(c)')
+add_corner_label(ax3, x_pos, y_pos, '(c)', fontsize)
 
 
 fig.tight_layout(pad=0, w_pad=0.25, h_pad=0)

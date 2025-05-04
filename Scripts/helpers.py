@@ -98,6 +98,48 @@ def make_wind_radii_obj(input_array):
         i += 4
     return wind_radii_obj
 
+def compute_wind_radii(awo_track_df, start_time, end_time):
+
+    #Computes the average wind radi over a specified time period
+
+    # Convert the 'date_and_time' column to datetime
+    awo_track_df['date_and_time'] = pd.to_datetime(awo_track_df['date_and_time'])
+
+    # Subset the DataFrame
+    subset_awo_track_df = awo_track_df[(awo_track_df['date_and_time'] >= start_time) & (awo_track_df['date_and_time'] <= end_time)]
+
+    
+    # Suppress SettingWithCopyWarning
+    pd.options.mode.chained_assignment = None
+
+    # Compute the average radius for r34, r50, and r64
+    subset_awo_track_df['r34_max'] = subset_awo_track_df[['r34_ne', 'r34_se', 'r34sw', 'r34nw']].max(axis=1)
+    subset_awo_track_df['r50_max'] = subset_awo_track_df[['r50ne', 'r50se', 'r50sw', 'r50nw']].max(axis=1)
+    subset_awo_track_df['r64_max'] = subset_awo_track_df[['r64ne', 'r64se', 'r64sw', 'r64nw']].max(axis=1)
+
+    # Compute the average wind radii across time
+    max_r34_across_time = subset_awo_track_df['r34_max'].values.max() 
+    max_r50_across_time = subset_awo_track_df['r50_max'].values.max()
+    max_r64_across_time = subset_awo_track_df['r64_max'].values.max()
+
+    # Re-enable SettingWithCopyWarning
+    pd.options.mode.chained_assignment = 'warn'
+
+    return subset_awo_track_df, max_r34_across_time, max_r50_across_time, max_r64_across_time
+
+def compute_max_wind_radii(df, timestamp):
+    # Convert the 'date_and_time' column to datetime
+    df['date_and_time'] = pd.to_datetime(df['date_and_time'])
+
+    r64 = df.loc[df['date_and_time'] == timestamp, ['r64ne', 'r64se', 'r64sw', 'r64nw']]
+    r50 = df.loc[df['date_and_time'] == timestamp, ['r50ne', 'r50se', 'r50sw', 'r50nw']]
+    r34 = df.loc[df['date_and_time'] == timestamp, ['r34_ne', 'r34_se', 'r34sw', 'r34nw']]
+
+    max_r64 = r64.max(axis=1).values[0]
+    max_r50 = r50.max(axis=1).values[0]
+    max_r34 = r34.max(axis=1).values[0]
+
+    return max_r64, max_r50, max_r34
 
 def make_wind_coords_obj(input_array):
     header = ['NE', 'SE', 'SW', 'NW']
@@ -418,14 +460,14 @@ def Track_Legend(axis, fontsize, markersize, xlocator, ylocator, loc):
 def Track_Legend_v2(axis, fontsize, markersize, xlocator, ylocator, loc):
         #Handles for legend
         bt = mlines.Line2D([], [], color='black', marker='s', markersize=markersize, ls='solid', label='best track')
-        awo = mlines.Line2D([], [], color='red', marker='o', markersize=markersize, ls='solid', label='$AWO$-$CTL$')
-        awo_ws = mlines.Line2D([], [], color='cyan', marker='*', markersize=markersize,ls='solid', label='$AWO_{ws}$-$EXP$')
+        awo = mlines.Line2D([], [], color='red', marker='o', markersize=markersize, ls='solid', label='$CTL$')
+        awo_ws = mlines.Line2D([], [], color='cyan', marker='*', markersize=markersize,ls='solid', label='$EXP$')
         axis.legend(handles=[bt, awo_ws, awo], 
                         prop = { "size": fontsize }, bbox_to_anchor=(xlocator, ylocator),
                         frameon=True, fancybox=True, shadow=True, loc=loc)
         
-def add_corner_label(ax, text, fontsize):
-    ax.text(0.03, 0.92, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
+# def add_corner_label(ax, text, fontsize):
+#     ax.text(0.03, 0.92, text, transform=ax.transAxes, bbox=dict(facecolor='darkgrey', alpha=0.8), fontsize=fontsize, fontweight='bold')
 
 
 

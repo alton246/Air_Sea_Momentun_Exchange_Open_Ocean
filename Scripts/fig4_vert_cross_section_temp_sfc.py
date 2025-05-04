@@ -68,7 +68,7 @@ ax1 = plt.subplot2grid(gridsize, (0, 0), colspan=1, rowspan=1)
 temp_awo = ax1.contourf(X, Y, awo_temp,
                   levels=sst_levels, extend='both', cmap=sst_cmaps)
 
-ax1.scatter(X, mld_awo_fin, color='k', marker='*', s=10)
+# ax1.scatter(X, mld_awo_fin, color='k', marker='*', s=10)
 
 #Colorbar
 hcb = fig.colorbar(temp_awo, shrink=shrink, aspect=10, ax=ax1, pad=0.02)
@@ -83,7 +83,7 @@ ax1.set_xlim([-100,100])
 ax1.set_ylim([100,1])
 cross_section_essential(30, 90, 10, 0.5)
 add_vertical_cross_section_axis_labels(ax1, fontsize, labelpad, labelsize, xticks[::2], yticks)
-ax1.set_title('$AWO$-$CTL$  $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
+ax1.set_title('$CTL$  $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
 
 add_corner_label(ax1, x_pos, y_pos,'(a)', fontsize)
 
@@ -93,7 +93,7 @@ ax2 = plt.subplot2grid(gridsize, (0, 1), colspan=1, rowspan=1)
 temp_awo_ws = ax2.contourf(X, Y, awo_ws_temp,
                   levels=sst_levels, extend='both', cmap=sst_cmaps)
 
-ax2.scatter(X, mld_awo_ws_fin, color='cyan', marker='*', s=10)
+# ax2.scatter(X, mld_awo_ws_fin, color='cyan', marker='*', s=10)
 
 hcb = fig.colorbar(temp_awo_ws,shrink=shrink, aspect=10, ax=ax2, pad=0.02)
 hcb.ax.tick_params(color='k', length=2.0, width=1.0, labelsize=5, pad=0.002)
@@ -104,7 +104,7 @@ ax2.set_xlim([-100,100])
 ax2.set_ylim([100,1])
 cross_section_essential(30, 90, 10, 0.5)
 add_vertical_cross_section_axis_labels(ax2, fontsize, labelpad, labelsize, xticks[::2], yticks)
-ax2.set_title(' $AWO_{ws}$-$EXP$ $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
+ax2.set_title('$EXP$ $T$ ($^{\circ}C$)', fontsize=fontsize, pad=1)
 
 add_corner_label(ax2, x_pos, y_pos,'(b)', fontsize)
 
@@ -115,8 +115,8 @@ ax3 = plt.subplot2grid(gridsize, (0, 2), colspan=1, rowspan=1)
 temp_diff_diff = ax3.contourf(X, Y, awo_temp - awo_ws_temp,
                   levels=sst_diff_levels, extend='both', cmap=cmaps.MPL_bwr)
 
-ax3.scatter(X, mld_awo_fin, color='k', marker='*', s=10, label='$AWO$')
-ax3.scatter(X, mld_awo_ws_fin, color='cyan', marker='*', s=10, label='$AWO_{ws}$')
+# ax3.scatter(X, mld_awo_fin, color='k', marker='*', s=10, label='$AWO$')
+# ax3.scatter(X, mld_awo_ws_fin, color='cyan', marker='*', s=10, label='$AWO_{ws}$')
 
 #Colorbar
 hcb = fig.colorbar(temp_diff_diff, shrink=shrink, aspect=10, ax=ax3, pad=0.02)
@@ -130,7 +130,7 @@ cross_section_essential(30, 75, 10, 0.5)
 add_vertical_cross_section_axis_labels(ax3, fontsize, labelpad, labelsize, xticks[::2], yticks)
 ax3.set_aspect('equal')
 
-ax3.set_title('$AWO$-$CTL$ $ - $ $AWO_{ws}$-$EXP$ $T$ ($^{\circ}C$)', loc='center', fontsize=fontsize, pad=1)
+ax3.set_title('$CTL$  - $EXP$ $T$ ($^{\circ}C$)', loc='center', fontsize=fontsize, pad=1)
 add_corner_label(ax3, x_pos, y_pos,'(c)', fontsize)
 
 # Legend
@@ -142,7 +142,7 @@ ax4 = plt.subplot2grid(gridsize, (1, 0), colspan=1, rowspan=1)
 curr_awo = ax4.contourf(X, Y, awo_curr,
                   levels=curr_levels,extend='max', cmap=cur_cmaps)
 
-ax4.scatter(X, mld_awo_fin, color='k', marker='*', s=10)
+# ax4.scatter(X, mld_awo_fin, color='k', marker='*', s=10)
 
 #Colorbar
 hcb = fig.colorbar(curr_awo,shrink=shrink, aspect=10, ax=ax4, pad=0.02)
@@ -154,7 +154,7 @@ ax4.set_xlim([-100,100])
 ax4.set_ylim([100,0]) # Limits
 ax4.set_aspect('equal')
 
-ax4.set_title('$AWO$-$CTL$ $U$ ($m/s$)', fontsize=fontsize, pad=1)
+ax4.set_title('$CTL$ $U$ ($m/s$)', fontsize=fontsize, pad=1)
 add_corner_label(ax4, x_pos, y_pos,'(d)', fontsize)
 
 
@@ -164,7 +164,7 @@ ax5 = plt.subplot2grid(gridsize, (1, 1), colspan=1, rowspan=1)
 curr_awo_ws = ax5.contourf(X, Y, awo_curr,
                   levels=curr_levels,extend='max', cmap=cur_cmaps)
 
-ax5.scatter(X, mld_awo_ws_fin, color='cyan', marker='*', s=10)
+# ax5.scatter(X, mld_awo_ws_fin, color='cyan', marker='*', s=10)
 
 #Colorbar
 hcb = fig.colorbar(curr_awo_ws,shrink=shrink, aspect=10, ax=ax5, pad=0.02)
@@ -176,7 +176,7 @@ add_vertical_cross_section_axis_labels(ax5, fontsize, labelpad, labelsize, xtick
 ax5.set_aspect('equal')
 ax5.set_ylim([100,0]) # Limits
 ax5.set_xlim([-100,100])
-ax5.set_title(' $AWO_{ws}$-$EXP$ $U$ ($m/s$)', fontsize=fontsize, pad=1)
+ax5.set_title('$EXP$ $U$ ($m/s$)', fontsize=fontsize, pad=1)
 add_corner_label(ax5, x_pos, y_pos,'(e)', fontsize)
 
 
@@ -185,8 +185,8 @@ ax6 = plt.subplot2grid(gridsize, (1, 2), colspan=1, rowspan=1)
 curr_diff = ax6.contourf(X, Y, awo_curr - awo_ws_curr,
                   levels=diff_levels,extend='both', cmap=cmaps.MPL_bwr)
 
-ax6.scatter(X, mld_awo_fin, color='k', marker='*', s=10, label='$AWO$')
-ax6.scatter(X, mld_awo_ws_fin, color='cyan', marker='*', s=10, label='$AWO_{ws}$')
+# ax6.scatter(X, mld_awo_fin, color='k', marker='*', s=10, label='$AWO$')
+# ax6.scatter(X, mld_awo_ws_fin, color='cyan', marker='*', s=10, label='$AWO_{ws}$')
 
 #Colorbar
 hcb = fig.colorbar(curr_diff,shrink=shrink, aspect=10, ax=ax6, pad=0.02)
@@ -199,7 +199,7 @@ add_vertical_cross_section_axis_labels(ax6, fontsize, labelpad, labelsize, xtick
 ax6.set_aspect('equal')
 ax6.set_xlim([-100,100])
 ax6.set_ylim([100,0]) # Limits
-ax6.set_title('$AWO$-$CTL$ $ - $ $AWO_{ws}$-$EXP$ \n$U$ ($m/s$)', loc='center', fontsize=fontsize, pad=1)
+ax6.set_title('$CTL$ - $EXP$ $U$ ($m/s$)', loc='center', fontsize=fontsize, pad=1)
 add_corner_label(ax6, x_pos, y_pos,'(f)', fontsize)
 
 # Legend
