@@ -667,4 +667,55 @@ def add_legend_to_summary_plot(axis, color1, color2, label1, label2, loc, size):
     axis.legend(handles=[swh_med, wspd_med, wspd_fit, swh_fit], 
             ncol=2, loc=loc, prop = {"size": size}, frameon=True, fancybox=True, shadow=True)
 
+#Aircraft Reconaiassance Functions
+def find_closest_time(track_data, fp_lon, fp_lat):
+    # Calculate the distance between each point in awo_track and the given fp_lon, fp_lat
+    distances = np.sqrt((track_data.lon - fp_lon)**2 + (track_data.lat - fp_lat)**2)
+    
+    # Find the index of the minimum distance
+    min_distance_index = distances.argmin()
+    
+    # Get the time associated with the closest point
+    closest_time = track_data.time[min_distance_index]
+    
+    return closest_time
 
+def find_min_wind_speed_location(aircraft_data, time_min, time_max):
+    # Filter the aircraft data between specified times
+    filtered_aircraft_data = aircraft_data.sel(time=slice(time_min, time_max))
+
+    # Find the index of the minimum wind speed within the filtered data
+    min_wind_speed_index = filtered_aircraft_data['SWS'].argmin().item()
+
+    # Get the minimum wind speed value
+    min_wind_speed = filtered_aircraft_data['SWS'][min_wind_speed_index].item()
+
+    # Get the latitude and longitude of the minimum wind speed
+    min_wind_speed_lat = filtered_aircraft_data['LAT'][min_wind_speed_index].item()
+    min_wind_speed_lon = filtered_aircraft_data['LON'][min_wind_speed_index].item()
+
+    return min_wind_speed, min_wind_speed_lat, min_wind_speed_lon
+
+def extract_wspd_values_north_south(awo_x_wave, awo_y_wave, awo_wave_data, x_min, x_max, y_min, y_max):
+    # Find the indices where awo_x_wave is 0 and awo_y_wave is between -200 and 200
+    indices = np.where((awo_x_wave > x_min) & (awo_x_wave < x_max) & (awo_y_wave > y_min) & (awo_y_wave < y_max))
+
+    # Extract the corresponding wspd values
+    wspd_values = awo_wave_data['wspd'][0].values[indices]
+
+    # Extract the corresponding awo_y_wave values
+    awo_y_values = awo_y_wave.values[indices]
+
+    return awo_y_values, wspd_values
+
+def extract_wspd_values_east_west(awo_x_wave, awo_y_wave, awo_wave_data, x_min, x_max, y_min, y_max):
+    # Find the indices where awo_x_wave is 0 and awo_y_wave is between -200 and 200
+    indices = np.where((awo_x_wave > x_min) & (awo_x_wave < x_max) & (awo_y_wave > y_min) & (awo_y_wave < y_max))
+
+    # Extract the corresponding wspd values
+    wspd_values = awo_wave_data['wspd'][0].values[indices]
+
+    # Extract the corresponding awo_y_wave values
+    awo_x_values = awo_x_wave.values[indices]
+
+    return awo_x_values, wspd_values
