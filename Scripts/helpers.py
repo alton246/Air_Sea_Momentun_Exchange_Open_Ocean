@@ -39,7 +39,7 @@ class atcf_csv():
         self.mslp = df['min_slp_mb'].to_numpy()    # [mb]
 
 class extract_ibt_data():
-    def __init__(self, num_entries, data):
+    def __init__(self, num_entries, data, name, year):
 
         j = 0 # Looping Variable used to fill the
 
@@ -53,7 +53,7 @@ class extract_ibt_data():
 
 
         for rows in range(len(data)):
-            if data[rows][5] == 'EARL' and data[rows][1] == '2010':
+            if data[rows][5] == name and data[rows][1] == year:
             
                 # Extracting dates from the NHC best track
                 self.date[j,:] = datetime.strptime(data[rows][6], '%Y-%m-%d %H:%M:%S')

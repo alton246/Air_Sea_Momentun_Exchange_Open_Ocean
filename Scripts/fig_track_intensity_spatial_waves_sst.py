@@ -38,7 +38,7 @@ awo_ocn_data  = xr.open_dataset(PATH_Hur + awo_hyc_data)
 awo_ws_ocn_data  = xr.open_dataset(PATH_Hur + awo_ws_hyc_data)
 
 # IBTRAC File
-track_file = 'ibtracs.NA.list.v04r00.csv'
+track_file = 'ibtracs.NA.list.v04r01.csv'
 
 #Wave Data
 wave_file = 'umwmout_2010-09-01_00:00:00.nc'
@@ -84,7 +84,7 @@ num_entries_earl, bt_data = counter(PATH_BT, track_file, storm_name, year_of_sto
 # Extracting pressure, wspd, date, lat, lon and 
 # colors for Hurricane EARL from best track dataset
 
-earl_bt_data = extract_ibt_data(num_entries_earl, bt_data)
+earl_bt_data = extract_ibt_data(num_entries_earl, bt_data, storm_name, year_of_storm)
 
 #Enter datetime string for the start and end time for NHC best track
 bt_start_date_index = earl_bt_data.date[::2].flatten().tolist().index(datetime(2010,8,27,0))
@@ -225,7 +225,7 @@ ax2.set_xlim([track_awo.time[::mod_skip][awo_start_date_index],
 # ax2.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d")) #Date Format
 ax2.set_ylabel('Wind Speed (m/s)', fontsize=fontlabel_size)
 ax2.set_xlabel('Date (mm-dd)', fontsize=fontlabel_size)
-add_corner_label(ax2, x_pos, y_pos, '(b)', fontsize=5.5)
+add_corner_label(ax2, x_pos, y_pos, '(c)', fontsize=5.5)
 ax2.set_yticks(ticks=wind_yticks)
 ax2.set_xticks(ticks = track_awo.time[::24])
 ax2.set_ylim([15, 70] ) #Minimum and Max x values 
@@ -274,7 +274,7 @@ hcb.ax.tick_params(color='k', length=3, width=1.5, labelsize=labelsize, pad=0.00
 
 Cartopy_Features(ax3, fontsize, plot_area, 2, 2, 'k')
 ax3.set_title('$CTL$ $H_{s}$ $(m)$', fontsize=fontsize, pad=1)
-add_corner_label(ax3, x_pos, y_pos, '(c)', 5.5)
+add_corner_label(ax3, x_pos, y_pos, '(b)', 5.5)
 
 ax4 = plt.subplot2grid(gridsize, (1, 2), colspan=2, rowspan=1, projection=crs)
 
