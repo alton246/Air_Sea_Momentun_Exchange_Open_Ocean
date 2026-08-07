@@ -16,13 +16,14 @@ from math import radians, sin, cos, sqrt, atan2
 from scipy.ndimage import gaussian_filter
 
 
-PNG='/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
+# PNG='/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
 
 #Model data directory
-Model_DIR = '/home/disk/orca/adaley17/Research/Stress_Separation/Hurricane_Earl/Data/'
+Model_DIR = '/home/orca3/adaley17/Projects/air_sea_mom_exchange_open_ocean/'
+PNG='/home/disk/orca3/adaley17/Projects/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
 
 #Obs data directory
-Obs_DIR = '/home/disk/orca/adaley17/orca3/adaley17/data/sfmr/'
+Obs_DIR = '/home/disk/orca3/adaley17/data/sfmr/'
 
 #Reconaissance SFMR data file
 sfmr_file = 'AFRC_SFMR20100901U1.nc'
@@ -55,23 +56,34 @@ awo_ws_fp_closest_time = find_closest_time(awo_ws_track, fp_lon, fp_lat)
 awo_sp_closest_time = find_closest_time(awo_track, sp_lon, sp_lat)
 awo_ws_sp_closest_time = find_closest_time(awo_ws_track, sp_lon, sp_lat)
 
+print(awo_fp_closest_time, awo_sp_closest_time)
+print(awo_ws_fp_closest_time, awo_ws_sp_closest_time)
+
 # Get the file names for the closest times
 #AWO
-awo_wave_files_fp = 'umwmout_' + awo_fp_closest_time.strftime('%Y-%m-%d_%H:%M:%S') + '.nc'
-awo_wave_files_sp = 'umwmout_' + awo_sp_closest_time.strftime('%Y-%m-%d_%H:%M:%S') + '.nc'
+# awo_wave_files_fp = 'umwmout_awo_' + awo_fp_closest_time.strftime('%Y-%m-%d_%H:%M:%S') + '.nc'
+# awo_wave_files_sp = 'umwmout_awo_' + awo_sp_closest_time.strftime('%Y-%m-%d_%H:%M:%S') + '.nc'
+awo_wave_files_fp = 'wrfout_awo_d02_' + awo_fp_closest_time.strftime('%Y-%m-%d_%H:%M:%S') 
+awo_wave_files_sp = 'wrfout_awo_d02_' + awo_sp_closest_time.strftime('%Y-%m-%d_%H:%M:%S')
+
 
 # AWO_ws
-awo_ws_wave_files_fp = 'umwmout_' + awo_ws_fp_closest_time.strftime('%Y-%m-%d_%H:%M:%S') + '.nc'
-awo_ws_wave_files_sp = 'umwmout_' + awo_ws_sp_closest_time.strftime('%Y-%m-%d_%H:%M:%S') + '.nc'
-
+# awo_ws_wave_files_fp = 'umwmout_awo_ws_' + awo_ws_fp_closest_time.strftime('%Y-%m-%d_%H:%M:%S') + '.nc'
+# awo_ws_wave_files_sp = 'umwmout_awo_ws_' + awo_ws_sp_closest_time.strftime('%Y-%m-%d_%H:%M:%S') + '.nc'
+awo_ws_wave_files_fp = 'wrfout_awo-ws_d02_' + awo_ws_fp_closest_time.strftime('%Y-%m-%d_%H:%M:%S')
+awo_ws_wave_files_sp = 'wrfout_awo-ws_d02_' + awo_ws_sp_closest_time.strftime('%Y-%m-%d_%H:%M:%S')
 #Accessing Data
 #AWO
-awo_wave_data_fp = xr.open_dataset(Model_DIR + 'awo5_2010082700_gfs_3.7.1/output/' +awo_wave_files_fp)
-awo_wave_data_sp = xr.open_dataset(Model_DIR + 'awo5_2010082700_gfs_3.7.1/output/' +awo_wave_files_sp)
+awo_wave_data_fp = xr.open_dataset(Model_DIR + awo_wave_files_fp)
+awo_wave_data_sp = xr.open_dataset(Model_DIR + awo_wave_files_sp)
+awo_wave_data_fp['wspd'] = np.sqrt(awo_wave_data_fp['U10']**2 + awo_wave_data_fp['V10']**2) #Computing wind speed from U10 and V10
+awo_wave_data_sp['wspd'] = np.sqrt(awo_wave_data_sp['U10']**2 + awo_wave_data_sp['V10']**2) #Computing wind speed from U10 and V10
 
-#AWO_ws
-awo_ws_wave_files_fp = xr.open_dataset(Model_DIR + 'awo5-ws_2010082700_gfs_3.7.1/output/' + awo_ws_wave_files_fp)
-awo_ws_wave_files_sp = xr.open_dataset(Model_DIR + 'awo5-ws_2010082700_gfs_3.7.1/output/' + awo_ws_wave_files_sp)
+#AWO-ws
+awo_ws_wave_files_fp = xr.open_dataset(Model_DIR + awo_ws_wave_files_fp)
+awo_ws_wave_files_sp = xr.open_dataset(Model_DIR + awo_ws_wave_files_sp)
+awo_ws_wave_files_fp['wspd'] = np.sqrt(awo_ws_wave_files_fp['U10']**2 + awo_ws_wave_files_fp['V10']**2) #Computing wind speed from U10 and V10
+awo_ws_wave_files_sp['wspd'] = np.sqrt(awo_ws_wave_files_sp['U10']**2 + awo_ws_wave_files_sp['V10']**2) #Computing wind speed from U10 and V10
 
 #Storm Info During First Pass
 awo_storm_centers_fp = getStormCenter(plain2datetime(awo_fp_closest_time.strftime('%Y%m%d%H')),
@@ -79,8 +91,8 @@ awo_storm_centers_fp = getStormCenter(plain2datetime(awo_fp_closest_time.strftim
 #AWO
 awo_storm_dir_fp = getStormDirection(plain2datetime(awo_fp_closest_time.strftime('%Y%m%d%H')), 
                                      awo_track) #Finding the track center
-awo_x_wave_fp, awo_y_wave_fp = latlon2xyStormRelative(awo_wave_data_fp['lon'][0], 
-                                                awo_wave_data_fp['lat'][0], 
+awo_x_wave_fp, awo_y_wave_fp = latlon2xyStormRelative(awo_wave_data_fp['XLONG'][0], 
+                                                awo_wave_data_fp['XLAT'][0], 
                                                 awo_storm_centers_fp[0], 
                                                 awo_storm_centers_fp[1], 
                                                 dir=awo_storm_dir_fp)
@@ -91,8 +103,8 @@ awo_ws_storm_centers_fp = getStormCenter(plain2datetime(awo_ws_fp_closest_time.s
                                          awo_ws_track) #Identifying the track center at this particular time
 awo_ws_storm_dir_fp = getStormDirection(plain2datetime(awo_ws_fp_closest_time.strftime('%Y%m%d%H')), 
                                         awo_ws_track) #Finding the track center
-awo_ws_x_wave_fp, awo_ws_y_wave_fp = latlon2xyStormRelative(awo_ws_wave_files_fp['lon'][0], 
-                                                      awo_ws_wave_files_fp['lat'][0], 
+awo_ws_x_wave_fp, awo_ws_y_wave_fp = latlon2xyStormRelative(awo_ws_wave_files_fp['XLONG'][0], 
+                                                      awo_ws_wave_files_fp['XLAT'][0], 
                                                       awo_ws_storm_centers_fp[0], 
                                                       awo_ws_storm_centers_fp[1], 
                                                       dir=awo_ws_storm_dir_fp)
@@ -103,8 +115,8 @@ awo_storm_centers_sp = getStormCenter(plain2datetime(awo_sp_closest_time.strftim
 #AWO
 awo_storm_dir_sp = getStormDirection(plain2datetime(awo_sp_closest_time.strftime('%Y%m%d%H')), 
                                      awo_track) #Finding the storm direction
-awo_x_wave_sp, awo_y_wave_sp = latlon2xyStormRelative(awo_wave_data_fp['lon'][0], 
-                                                awo_wave_data_fp['lat'][0], 
+awo_x_wave_sp, awo_y_wave_sp = latlon2xyStormRelative(awo_wave_data_sp['XLONG'][0], 
+                                                awo_wave_data_sp['XLAT'][0], 
                                                 awo_storm_centers_sp[0], 
                                                 awo_storm_centers_sp[1], 
                                                 dir=awo_storm_dir_sp)
@@ -115,8 +127,8 @@ awo_ws_storm_centers_sp = getStormCenter(plain2datetime(awo_ws_sp_closest_time.s
                                          awo_ws_track) #Identifying the track center at this particular time
 awo_ws_storm_dir_sp = getStormDirection(plain2datetime(awo_ws_sp_closest_time.strftime('%Y%m%d%H')), 
                                         awo_ws_track) #Finding the storm direction
-awo_ws_x_wave_sp, awo_ws_y_wave_sp = latlon2xyStormRelative(awo_ws_wave_files_sp['lon'][0], 
-                                                      awo_ws_wave_files_sp['lat'][0], 
+awo_ws_x_wave_sp, awo_ws_y_wave_sp = latlon2xyStormRelative(awo_ws_wave_files_sp['XLONG'][0], 
+                                                      awo_ws_wave_files_sp['XLAT'][0], 
                                                       awo_ws_storm_centers_sp[0], 
                                                       awo_ws_storm_centers_sp[1], 
                                                       dir=awo_ws_storm_dir_sp)
@@ -183,6 +195,12 @@ masked_sws_ew = np.where((sfmr_x_sp > 0) & (sfmr_x_sp < 20) & (sfmr_y_sp > -25) 
                         (sfmr_y_sp < 30) & (masked_sws_ew >= 25), 
                         np.nan, masked_sws_ew)
 
+#Binning the SFMR data
+bin_min, bin_max, num_bins = -200, 200, 401
+
+wspd_binned_means_ew = bin_average_sfmr_wind_speed(sfmr_x_fp, masked_sws_ew, bin_min, bin_max, num_bins)
+wspd_binned_means_ns = bin_average_sfmr_wind_speed(sfmr_y_fp, masked_sws_ns, bin_min, bin_max, num_bins)
+
 xmin_sfmr = -200
 xmax_sfmr = 200
 ymin_sfmr = 0
@@ -195,17 +213,19 @@ ymax = xmax
 
 ticks=np.arange(-250, 300, 50)
 
-xloc, yloc = 0.03, 0.92
+xloc, yloc = 0.05, 0.88
 #Figure Settings
-fontsize=12
-labelsize=10
+fontsize=6
+labelsize=6
 gridsize =(2,2)
+s=10
+lw=1
 # zorder=200
 # size=50
 
 #Colorbar Settings
-wspd_levels = np.arange(5,57.5,2.5)
-CMAPS = cmaps.MPL_gist_rainbow_r
+wspd_levels = np.arange(7,55,2.5)
+CMAPS = cmaps.cmp_haxby_r
 shrink=0.70
 aspect=18
 width=0.5
@@ -214,7 +234,7 @@ length=4
 labelpad = 0.25
 
 #Plotting the data
-fig = plt.figure(figsize=(8, 8))
+fig = plt.figure(figsize=(4, 4))
 
 ax1 = plt.subplot2grid(gridsize, (0, 0), colspan=1, rowspan=1)
 
@@ -222,7 +242,7 @@ awo_wspd = ax1.contourf(awo_x_wave_fp, awo_y_wave_fp, awo_wave_data_fp['wspd'][0
                         levels=wspd_levels, cmap=CMAPS, extend='both')
 
 sfmr_wspd = ax1.scatter(sfmr_x_sp, sfmr_y_sp, c=aircraft_data['SWS'].values, 
-                        s=25, cmap=CMAPS, vmin=5, vmax=55)
+                        s=s, cmap=CMAPS, vmin=5, vmax=55)
 
 #Colorbar
 hcb = fig.colorbar(awo_wspd, shrink=shrink, aspect=aspect, ax=ax1, pad=0.02)
@@ -245,7 +265,7 @@ awo_ws_wspd = ax2.contourf(awo_ws_x_wave_fp, awo_ws_y_wave_fp, awo_ws_wave_files
 
 #SFMR
 sfmr_wspd = ax2.scatter(sfmr_x_sp, sfmr_y_sp, c=aircraft_data['SWS'].values, 
-                        s=25, cmap=CMAPS, vmin=5, vmax=55)
+                        s=s, cmap=CMAPS, vmin=5, vmax=55)
 
 #Colorbar
 hcb = fig.colorbar(awo_ws_wspd, shrink=shrink, aspect=aspect, ax=ax2, pad=0.02)
@@ -263,9 +283,9 @@ ax2.set_title('EXP ' + awo_ws_fp_closest_time.strftime('%Y-%m-%d %H:%M:%S'), fon
 #AWO
 ax3 = plt.subplot2grid(gridsize, (1, 0), colspan=1, rowspan=1)
 
-ax3.plot(x_dist, awo_wspd_values_smooth_ew, c='red', label='CTL')
-ax3.plot(x_dist, awo_ws_wspd_values_smooth_ew, c='blue', label='EXP')
-ax3.plot(sfmr_x_fp, masked_sws_ew, c='k', label='SFMR')
+ax3.plot(x_dist, awo_wspd_values_smooth_ew, c='red', lw=lw, label='CTL')
+ax3.plot(x_dist, awo_ws_wspd_values_smooth_ew, c='cyan', lw=lw, label='EXP')
+ax3.plot(x_dist, wspd_binned_means_ew, c='k', lw=lw, label='SFMR')
 
 
 
@@ -275,15 +295,19 @@ ax3.set_ylim(ymin_sfmr, ymax_sfmr)
 ax3.set_xlabel('Distance to Storm Center (km)', fontsize=fontsize)
 ax3.set_ylabel('Wind Speed (m/s)', fontsize=fontsize)
 ax3.set_title('West - East', fontsize=fontsize)
-add_corner_label(ax3, xloc, yloc, '(c)', fontsize)
 ax3.grid(True, linestyle='--', linewidth=0.5)
-ax3.legend(loc='upper right', fontsize=fontsize)
+ax3.set_yticks(np.arange(0, 60, 10))
+ax3.set_yticklabels(np.arange(0, 60, 10), fontsize=fontsize)
+ax3.set_xticks(np.arange(-200, 250, 100))
+ax3.set_xticklabels(np.arange(-200, 250, 100), fontsize=fontsize)
+add_corner_label(ax3, xloc, yloc, '(c)', fontsize)
+ax3.legend(loc='upper right', frameon=True, shadow=True, fontsize=4)
 
 ax4 = plt.subplot2grid(gridsize, (1, 1), colspan=1, rowspan=1)
 
-ax4.plot(y_dist, awo_wspd_values_smooth_ns, c='red', label='CTL')
-ax4.plot(y_dist, awo_ws_wspd_values_smooth_ns, c='blue', label='EXP')
-ax4.plot(sfmr_y_fp, masked_sws_ns, c='k', label='SFMR')
+ax4.plot(y_dist, awo_wspd_values_smooth_ns, lw=lw, c='red', label='CTL')
+ax4.plot(y_dist, awo_ws_wspd_values_smooth_ns, lw=lw, c='cyan', label='EXP')
+ax4.plot(y_dist, wspd_binned_means_ns, lw=lw, c='k', label='obs')
 
 ax4.set_xlim(xmin_sfmr, xmax_sfmr)
 ax4.set_ylim(ymin_sfmr, ymax_sfmr)
@@ -291,13 +315,16 @@ ax4.set_ylim(ymin_sfmr, ymax_sfmr)
 ax4.set_xlabel('Distance to Storm Center (km)', fontsize=fontsize)
 ax4.set_ylabel('Wind Speed (m/s)', fontsize=fontsize)
 ax4.set_title('North - South', fontsize=fontsize)
-add_corner_label(ax4, xloc, yloc, '(d)', fontsize)
+ax4.set_yticks(np.arange(0, 60, 10))
+ax4.set_yticklabels(np.arange(0, 60, 10), fontsize=fontsize)
+ax4.set_xticks(np.arange(-200, 250, 100))
+ax4.set_xticklabels(np.arange(-200, 250, 100), fontsize=fontsize)
 ax4.grid(True, linestyle='--', linewidth=0.5)
-
+add_corner_label(ax4, xloc, yloc, '(d)', fontsize)
 fig.tight_layout(pad=0, w_pad=0, h_pad=0)
 
 
-plt.savefig(PNG + 'fig2_verification_wspd_aircraft_reconaissance_sfmr.png', dpi=300, bbox_inches='tight', 
+plt.savefig(PNG + 'fig4_verification_wspd_aircraft_reconaissance_sfmr_ESS.png', dpi=300, bbox_inches='tight', 
             facecolor='w', edgecolor='w', transparent=False)
 
-plt.show()
+# plt.show()

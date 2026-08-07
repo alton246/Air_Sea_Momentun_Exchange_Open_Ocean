@@ -6,32 +6,42 @@ from helpers import *
 
 #Setting PATH of data and 
 PATH = '/home/disk/orca/adaley17/Research/Stress_Separation/Hurricane_Earl/Notebooks/SST_Analysis/Composites/Data_Currents_Zlevels/'
-PNG='/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
+PNG='/home/disk/orca/adaley17/orca3/adaley17/Projects/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
 
 
 #Opening data files
-with xr.open_mfdataset(PATH + 'storm_relative_hycom_3d.20100901??.nc', use_cftime=True) as ds:
+with xr.open_mfdataset(PATH + 'storm_relative_hycom_3d_zlevels.*.nc', use_cftime=True) as ds:
     ds_timemean_slice = ds.copy().sel(y=-98, method='nearest').sel(time=slice('2010-09-01T06:00:00','2010-09-01T11:00:00')).mean(dim='time')
 
+min_depth, max_depth, delta_depth  = 0, 1000, 1
+depth_levels = np.arange(min_depth, max_depth + delta_depth, delta_depth)
+
+# create 3D array (201, 126, 126) where each depth level is repeated across the 126x126 grid
+depth_grid = np.broadcast_to(depth_levels[:, None, None], (depth_levels.size, 
+                                                           ds_timemean_slice.x.shape[0], 
+                                                           ds_timemean_slice.x.shape[0])).copy()
+
+X, Ydum = np.meshgrid(ds_timemean_slice.x, depth_levels)
+
 # Accessing Data of interest
-X = ds_timemean_slice['x'].data
-Y = ds_timemean_slice['z_interp'].data
-awo_temp = ds_timemean_slice['temp_interp_awo'].data.compute()
-awo_ws_temp = ds_timemean_slice['temp_interp_awo_ws'].data.compute()
+# X = ds_timemean_slice['x'].data
+Y = depth_grid[:,0,:]
+awo_temp = ds_timemean_slice['temp_awo']
+awo_ws_temp = ds_timemean_slice['temp_awo_ws']
 
 #Computing Currents
-awo_curr = np.sqrt(ds_timemean_slice['u-vel_interp_awo']**2 + ds_timemean_slice['v-vel_interp_awo']**2)
-awo_ws_curr = np.sqrt(ds_timemean_slice['u-vel_interp_awo_ws']**2 + ds_timemean_slice['v-vel_interp_awo_ws']**2)
+awo_curr = ds_timemean_slice['sfc_awo']
+awo_ws_curr = ds_timemean_slice['sfc_awo_ws']
 
-awo_mld_val = awo_temp[np.argwhere(Y==10.5)]
-awo_ws_mld_val = awo_ws_temp[np.argwhere(Y==10.5)]
+# awo_mld_val = awo_temp[np.argwhere(Y==10.5)]
+# awo_ws_mld_val = awo_ws_temp[np.argwhere(Y==10.5)]
                  
-mld_awo = [0.0] * len(awo_mld_val.flatten().tolist())
-mld_awo_ws = [0.0] * len(awo_ws_mld_val.flatten().tolist())
+# mld_awo = [0.0] * len(awo_mld_val.flatten().tolist())
+# mld_awo_ws = [0.0] * len(awo_ws_mld_val.flatten().tolist())
 
 #MLD Data
-mld_awo_fin = get_mixed_layer_depth(awo_temp, mld_awo, Y)
-mld_awo_ws_fin = get_mixed_layer_depth(awo_ws_temp, mld_awo_ws, Y)
+# mld_awo_fin = get_mixed_layer_depth(awo_temp, mld_awo, Y)
+# mld_awo_ws_fin = get_mixed_layer_depth(awo_ws_temp, mld_awo_ws, Y)
 
 #Contour levels
 curr_levels = np.arange(0,2.10,0.10)
@@ -39,10 +49,13 @@ sst_levels=np.arange(25, 30.25, 0.25)
 diff_levels=np.arange(-0.2,0.25,0.05)
 sst_diff_levels = np.arange(-0.6, 0.7, 0.1)
 
+clevs_sst, clist_sst = anom_cbar(20, len(sst_diff_levels), 'blue', 'tomato')
+clevs_sfc, clist_sfc = anom_cbar(0.5, len(diff_levels), 'blue', 'tomato')
+
 #Colorbar Options
 size=0.25
 shrink=0.25
-cur_cmaps = cmaps.BkBlAqGrYeOrReViWh200_r
+cur_cmaps = cmaps.WhiteBlueGreenYellowRed
 sst_cmaps = cmaps.MPL_jet
 
 # Set Font information
@@ -113,7 +126,7 @@ ax3 = plt.subplot2grid(gridsize, (0, 2), colspan=1, rowspan=1)
 # ax3.pcolormesh(awo_X, awo_Y, awo_vcross_data['curr_speed'][0] - awo_ws_vcross_data['curr_speed'][0],
 #                   vmin=-0.5, vmax=0.5, cmap=cmaps.MPL_bwr, rasterized=True)
 temp_diff_diff = ax3.contourf(X, Y, awo_temp - awo_ws_temp,
-                  levels=sst_diff_levels, extend='both', cmap=cmaps.MPL_bwr)
+                  levels=sst_diff_levels, colors=clist_sst, extend='both')
 
 # ax3.scatter(X, mld_awo_fin, color='k', marker='*', s=10, label='$AWO$')
 # ax3.scatter(X, mld_awo_ws_fin, color='cyan', marker='*', s=10, label='$AWO_{ws}$')
@@ -134,8 +147,8 @@ ax3.set_title('$CTL$  - $EXP$ $T$ ($^{\circ}C$)', loc='center', fontsize=fontsiz
 add_corner_label(ax3, x_pos, y_pos,'(c)', fontsize)
 
 # Legend
-plt.legend(loc='lower left', facecolor='white', framealpha=0.7,
-        prop = { "size": 5})
+# plt.legend(loc='lower left', facecolor='white', framealpha=0.7,
+#         prop = { "size": 5})
 
 ax4 = plt.subplot2grid(gridsize, (1, 0), colspan=1, rowspan=1)
 
@@ -154,14 +167,14 @@ ax4.set_xlim([-100,100])
 ax4.set_ylim([100,0]) # Limits
 ax4.set_aspect('equal')
 
-ax4.set_title('$CTL$ $U$ ($m/s$)', fontsize=fontsize, pad=1)
+ax4.set_title('$CTL$ $Ocn. Curr.$ ($m/s$)', fontsize=fontsize, pad=1)
 add_corner_label(ax4, x_pos, y_pos,'(d)', fontsize)
 
 
 
 ax5 = plt.subplot2grid(gridsize, (1, 1), colspan=1, rowspan=1)
 
-curr_awo_ws = ax5.contourf(X, Y, awo_curr,
+curr_awo_ws = ax5.contourf(X, Y, awo_ws_curr,
                   levels=curr_levels,extend='max', cmap=cur_cmaps)
 
 # ax5.scatter(X, mld_awo_ws_fin, color='cyan', marker='*', s=10)
@@ -176,14 +189,14 @@ add_vertical_cross_section_axis_labels(ax5, fontsize, labelpad, labelsize, xtick
 ax5.set_aspect('equal')
 ax5.set_ylim([100,0]) # Limits
 ax5.set_xlim([-100,100])
-ax5.set_title('$EXP$ $U$ ($m/s$)', fontsize=fontsize, pad=1)
+ax5.set_title('$EXP$ $Ocn. Curr.$ ($m/s$)', fontsize=fontsize, pad=1)
 add_corner_label(ax5, x_pos, y_pos,'(e)', fontsize)
 
 
 ax6 = plt.subplot2grid(gridsize, (1, 2), colspan=1, rowspan=1)
 
 curr_diff = ax6.contourf(X, Y, awo_curr - awo_ws_curr,
-                  levels=diff_levels,extend='both', cmap=cmaps.MPL_bwr)
+                  levels=diff_levels,extend='both', colors=clist_sfc)
 
 # ax6.scatter(X, mld_awo_fin, color='k', marker='*', s=10, label='$AWO$')
 # ax6.scatter(X, mld_awo_ws_fin, color='cyan', marker='*', s=10, label='$AWO_{ws}$')
@@ -199,14 +212,14 @@ add_vertical_cross_section_axis_labels(ax6, fontsize, labelpad, labelsize, xtick
 ax6.set_aspect('equal')
 ax6.set_xlim([-100,100])
 ax6.set_ylim([100,0]) # Limits
-ax6.set_title('$CTL$ - $EXP$ $U$ ($m/s$)', loc='center', fontsize=fontsize, pad=1)
+ax6.set_title('$CTL$ - $EXP$ $Ocn. Curr.$ ($m/s$)', loc='center', fontsize=fontsize, pad=1)
 add_corner_label(ax6, x_pos, y_pos,'(f)', fontsize)
 
 # Legend
-plt.legend(loc='lower left', facecolor='white', framealpha=0.7,
-        prop = { "size": 5})
+# plt.legend(loc='lower left', facecolor='white', framealpha=0.7,
+#         prop = { "size": 5})
 
 fig.tight_layout(pad=0.5, w_pad=0.5, h_pad=-8)
 
-plt.savefig(PNG +'fig4_vert_cross_sfc_temp_2010090106-2010090111_test.png', dpi=300, bbox_inches='tight',
+plt.savefig(PNG +'fig11_vert_cross_sfc_temp_2010090106-2010090111_ESS.png', dpi=300, bbox_inches='tight',
                 facecolor='w', transparent=False)
