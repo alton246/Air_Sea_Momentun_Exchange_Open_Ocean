@@ -24,9 +24,10 @@ import cartopy.io.img_tiles as cimgt
 
 #Reading data
 # Modelled Data
-PATH_Hur = '/home/disk/orca/adaley17/Research/Stress_Separation/Hurricane_Earl/Data/'
-PNG='/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
-PNG2='/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentum_Exchange_TC_Coast/Notebooks/Figure1/'
+PATH_Hur = '/home/orca3/adaley17/Projects/air_sea_mom_exchange_open_ocean/'
+PNG='/home/disk/orca3/adaley17/Projects/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
+
+# PNG2='/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentum_Exchange_TC_Coast/Notebooks/Figure1/'
 
 #UWIN-CM Best Track
 earl_awo = PATH_Hur + 'earl_5.log_awo.csv'
@@ -34,29 +35,29 @@ earl_awo_ws = PATH_Hur + 'earl_5.log_awo-ws.csv'
 
 #Ocean Data
 ocn_file = 'archv.2010_244_01.nc'
-awo_hyc_data = 'awo5_2010082700_gfs_3.7.1/' + ocn_file
-awo_ws_hyc_data = 'awo5-ws_2010082700_gfs_3.7.1/' + ocn_file
+# awo_hyc_data = 'awo5_2010082700_gfs_3.7.1/' + ocn_file
+# awo_ws_hyc_data = 'awo5-ws_2010082700_gfs_3.7.1/' + ocn_file
 
 #Accessing Ocean Data
-awo_ocn_data  = xr.open_dataset(PATH_Hur + awo_hyc_data)
-awo_ws_ocn_data  = xr.open_dataset(PATH_Hur + awo_ws_hyc_data)
+awo_ocn_data  = xr.open_dataset(PATH_Hur + ocn_file)
+# awo_ws_ocn_data  = xr.open_dataset(PATH_Hur + awo_ws_hyc_data)
 
 #Computing Currents
 awo_ocn_data['currents'] = np.sqrt(awo_ocn_data['u-vel']**2 + awo_ocn_data['v-vel']**2)
-awo_ws_ocn_data['currents'] = np.sqrt(awo_ws_ocn_data['u-vel']**2 + awo_ws_ocn_data['v-vel']**2)
+# awo_ws_ocn_data['currents'] = np.sqrt(awo_ws_ocn_data['u-vel']**2 + awo_ws_ocn_data['v-vel']**2)
 
 #Wave Data
 wave_file = 'umwmout_2010-09-01_01:00:00.nc'
-awo_umwm_data = 'awo5_2010082700_gfs_3.7.1/output/' + wave_file
-awo_ws_umwm_data = 'awo5-ws_2010082700_gfs_3.7.1/output/' + wave_file
+# awo_umwm_data = 'awo5_2010082700_gfs_3.7.1/output/' + wave_file
+# awo_ws_umwm_data = 'awo5-ws_2010082700_gfs_3.7.1/output/' + wave_file
 
 #Accessing Ocean Data
-awo_wave_data  = xr.open_dataset(PATH_Hur + awo_umwm_data)
-awo_ws_wave_data  = xr.open_dataset(PATH_Hur + awo_ws_umwm_data)
+awo_wave_data  = xr.open_dataset(PATH_Hur + wave_file)
+# awo_ws_wave_data  = xr.open_dataset(PATH_Hur + awo_ws_umwm_data)
 
 #Computing Ocean Surface Currents
 awo_wave_data['currents'] = np.sqrt(awo_wave_data['uc']**2 + awo_wave_data['vc']**2)
-awo_ws_wave_data['currents'] = np.sqrt(awo_ws_wave_data['uc']**2 + awo_ws_wave_data['vc']**2)
+# awo_ws_wave_data['currents'] = np.sqrt(awo_ws_wave_data['uc']**2 + awo_ws_wave_data['vc']**2)
 
 
 # IBTRAC Data
@@ -69,7 +70,7 @@ track_awo_ws = atcf_csv(earl_awo_ws) #AWO-ws
 
 #Dates of interest
 date_of_int = pd.date_range('2010-08-27T00:00:00', '2010-09-03T00:00:00',
-                                      freq='1H')
+                                      freq='1h')
 
 # UWINCM Storm Centers
 #AWO
@@ -88,9 +89,13 @@ awo_swh_end_date_index = track_awo.time[::3].flatten().tolist().index(datetime(2
 #Start of Plotting
 
 #Set Domain Size and Cartopy Options here
-min_lat = 14
-max_lat = 30
-min_lon = -80
+# min_lat = 14
+# max_lat = 30
+# min_lon = -80
+# max_lon = -60
+min_lat = 18
+max_lat = 26
+min_lon = -74
 max_lon = -60
 
 crs = ccrs.PlateCarree()
@@ -100,26 +105,28 @@ plot_area = [max_lon + 360.0, min_lon + 360.0, min_lat, max_lat]
 #Set Figure Options Here
 skip_vec = 30
 sst_levels = np.arange(28, 29.7, 0.1)
-wspd_levels = np.arange(5,57.5,2.5)
+wspd_levels = np.arange(7,55,2.5)
 diff_levels = np.arange(-0.3, 0.35, 0.05)
+sfc_levels = np.arange(0.4, 2.05, 0.05)
 swh_levels = np.arange(0,17,1)
-fontsize=8
+fontsize=6
 headwidth=4
 rcParams['xtick.major.pad']='0'
 xlocator =4
 ylocator=4
-fontsize=10
+fontsize=6
 markersize=2
 lw=1
-shrink=0.95
+shrink=0.30
 
-aspect=18
+aspect=15
 width=0.5
 length=4
 
 skip=24
-labelsize=8
-y_pos=0.92
+labelsize=6
+x_pos=0.04
+y_pos=0.82
 
 #Wave Vector Components
 u_wvd = np.cos(awo_wave_data['mwd'][0])
@@ -134,8 +141,8 @@ awo_storm_dir = getStormDirection(plain2datetime('2010090101'), track_awo)
 x_comp_storm_dir = np.cos(awo_storm_dir)
 y_comp_storm_dir = np.sin(awo_storm_dir)
 
-gridsize = (3, 1)
-fig = plt.figure(figsize=(8, 8))
+gridsize = (2, 2)
+fig = plt.figure(figsize=(4, 4))
 
 #AWO Wave
 ax1 = plt.subplot2grid(gridsize, (0, 0), colspan=1, rowspan=1, projection=crs)
@@ -158,8 +165,8 @@ vec_wave = ax1.quiver(awo_wave_data['lon'][0][::skip_vec, ::skip_vec], awo_wave_
 vec_wave = ax1.quiver(storm_centers_awo[:,0][::3][awo_swh_end_date_index], 
             storm_centers_awo[:,1][::3][awo_swh_end_date_index], 
                      x_comp_storm_dir, y_comp_storm_dir, 
-                     angles='xy', scale_units='xy', scale=0.4, color='white', 
-                     headwidth=headwidth, linewidths=0.25, edgecolors='white')
+                     angles='xy', scale_units='xy', scale=0.4, color='magenta', 
+                     headwidth=headwidth, linewidths=0.25, edgecolors='k')
 
 #Wind Vector
 vec_wind = ax1.quiver(awo_wave_data['lon'][0][::skip_vec, ::skip_vec], awo_wave_data['lat'][0][::skip_vec, ::skip_vec], 
@@ -174,13 +181,13 @@ hcb.ax.tick_params(color='k', length=3, width=1.5, labelsize=labelsize, pad=0.00
 
 
 Cartopy_Features(ax1, fontsize, plot_area, 2, 2, 'k')
-ax1.set_title('$AWO$-$CTL$ $H_{s}$ $(m)$', fontsize=fontsize, pad=1)
-add_corner_label(ax1, y_pos, '(a)')
+ax1.set_title('$CTL$ $H_{s}$ $(m)$', fontsize=fontsize, pad=1)
+add_corner_label(ax1, x_pos, y_pos, '(a)', fontsize)
 
 #AWO WSPD
-ax2 = plt.subplot2grid(gridsize, (1, 0), colspan=1, rowspan=1, projection=crs)
+ax2 = plt.subplot2grid(gridsize, (0, 1), colspan=1, rowspan=1, projection=crs)
 awo_wspd = ax2.contourf(awo_wave_data['lon'][0], awo_wave_data['lat'][0], awo_wave_data['wspd'][0], 
-                        cmap=cmaps.MPL_gist_rainbow_r, levels=wspd_levels, extend='both', transform=ccrs.PlateCarree())
+                        cmap=cmaps.cmp_haxby_r, levels=wspd_levels, extend='both', transform=ccrs.PlateCarree())
 
 hcb = fig.colorbar(awo_wspd, shrink=shrink, aspect=aspect, ax=ax2, pad=0.02)
 hcb.ax.tick_params(color='k', length=length, width=width, labelsize=labelsize, pad=0.002)
@@ -192,48 +199,73 @@ Cartopy_Features(ax2, fontsize, plot_area, 2, 2, 'k')
 vec_wave = ax2.quiver(storm_centers_awo[:,0][::3][awo_swh_end_date_index], 
             storm_centers_awo[:,1][::3][awo_swh_end_date_index], 
                      x_comp_storm_dir, y_comp_storm_dir, 
-                     angles='xy', scale_units='xy', scale=0.4, color='white', 
-                     headwidth=headwidth, linewidths=0.25, edgecolors='white')
+                     angles='xy', scale_units='xy', scale=0.4, color='magenta', 
+                     headwidth=headwidth, linewidths=0.25, edgecolors='k')
 
 ax2.scatter(storm_centers_awo[:,0][::3][awo_swh_start_date_index:awo_swh_end_date_index], 
             storm_centers_awo[:,1][::3][awo_swh_start_date_index:awo_swh_end_date_index], 
          linestyle='-', facecolors='white', edgecolors='k', marker='o', s=5)
 
-ax2.set_title('$AWO$-$CTL$ $U_{10}$ ($m/s$)', fontsize=fontsize, pad=1)
 
-add_corner_label(ax2, y_pos, '(b)')
+ax2.set_title('$CTL$ $U_{10}$ ($m/s$)', fontsize=fontsize, pad=1)
 
-# AWO SST
-ax3 = plt.subplot2grid(gridsize, (2, 0), colspan=1, rowspan=1, projection=crs)
+add_corner_label(ax2, x_pos, y_pos, '(b)', fontsize)
 
-awo_sst = ax3.contourf(awo_ocn_data['longitude'], awo_ocn_data['latitude'], awo_ocn_data['temp'][0][0], 
-                        cmap=cmaps.MPL_jet, levels=sst_levels, extend='both', transform=ccrs.PlateCarree())
-
-hcb = fig.colorbar(awo_sst, shrink=shrink, aspect=aspect, ax=ax3, pad=0.02)
-hcb.ax.tick_params(color='k', length=length, width=width, labelsize=labelsize, pad=0.002)
-hcb.ax.minorticks_on()
-
-#StormDirection vector
-vec_wave = ax3.quiver(storm_centers_awo[:,0][::3][awo_swh_end_date_index], 
-            storm_centers_awo[:,1][::3][awo_swh_end_date_index], 
-                     x_comp_storm_dir, y_comp_storm_dir, 
-                     angles='xy', scale_units='xy', scale=0.4, color='white', 
-                     headwidth=headwidth, linewidths=0.25, edgecolors='white')
+#AWO Currents
+ax3 = plt.subplot2grid(gridsize, (1, 0), colspan=1, rowspan=1, projection=crs)   
+awo_curr = ax3.contourf(awo_wave_data['lon'][0], awo_wave_data['lat'][0], 
+                             awo_wave_data['currents'][0], cmap=cmaps.WhiteBlueGreenYellowRed, 
+                             levels=sfc_levels, extend='both', transform=ccrs.PlateCarree())
 
 ax3.scatter(storm_centers_awo[:,0][::3][awo_swh_start_date_index:awo_swh_end_date_index], 
             storm_centers_awo[:,1][::3][awo_swh_start_date_index:awo_swh_end_date_index], 
          linestyle='-', facecolors='white', edgecolors='k', marker='o', s=5)
 
+#StormDirection vector
+vec_wave = ax3.quiver(storm_centers_awo[:,0][::3][awo_swh_end_date_index], 
+            storm_centers_awo[:,1][::3][awo_swh_end_date_index], 
+                     x_comp_storm_dir, y_comp_storm_dir, 
+                     angles='xy', scale_units='xy', scale=0.4, color='magenta', 
+                     headwidth=headwidth, linewidths=0.25, edgecolors='k')
+
+hcb = fig.colorbar(awo_curr, shrink=shrink, aspect=aspect, ax=ax3, pad=0.02)
+hcb.ax.tick_params(color='k', length=length, width=width, labelsize=labelsize, pad=0.002)
+hcb.ax.minorticks_on()
+
 Cartopy_Features(ax3, fontsize, plot_area, 2, 2, 'k')
-ax3.set_title('$AWO$-$CTL$ SST ($^{\circ}$C)', fontsize=fontsize, pad=1)
+ax3.set_title('$CTL$ $SFC$ ($m/s$)', fontsize=fontsize, pad=1)
+add_corner_label(ax3, x_pos, y_pos, '(c)', fontsize)
 
-add_corner_label(ax3, y_pos, '(c)')
+
+# AWO SST
+ax4 = plt.subplot2grid(gridsize, (1, 1), colspan=1, rowspan=1, projection=crs)
+
+awo_sst = ax4.contourf(awo_ocn_data['longitude'], awo_ocn_data['latitude'], awo_ocn_data['temp'][0][0], 
+                        cmap=cmaps.MPL_jet, levels=sst_levels, extend='both', transform=ccrs.PlateCarree())
+
+hcb = fig.colorbar(awo_sst, shrink=shrink, aspect=aspect, ax=ax4, pad=0.02)
+hcb.ax.tick_params(color='k', length=length, width=width, labelsize=labelsize, pad=0.002)
+hcb.ax.minorticks_on()
 
 
-fig.tight_layout(pad=0, w_pad=0.25, h_pad=0)
+#StormDirection vector
+vec_wave = ax4.quiver(storm_centers_awo[:,0][::3][awo_swh_end_date_index], 
+            storm_centers_awo[:,1][::3][awo_swh_end_date_index], 
+                     x_comp_storm_dir, y_comp_storm_dir, 
+                     angles='xy', scale_units='xy', scale=0.4, color='magenta', 
+                     headwidth=headwidth, linewidths=0.25, edgecolors='k')
 
-plt.savefig(PNG + 'large_scale_swh_wspd_sst.png', dpi=300, bbox_inches='tight',
-                facecolor='w', transparent=False)
+ax4.scatter(storm_centers_awo[:,0][::3][awo_swh_start_date_index:awo_swh_end_date_index], 
+            storm_centers_awo[:,1][::3][awo_swh_start_date_index:awo_swh_end_date_index], 
+         linestyle='-', facecolors='white', edgecolors='k', marker='o', s=5)
 
-plt.savefig(PNG2 + 'large_scale_swh_wspd_sst.png', dpi=300, bbox_inches='tight',
+Cartopy_Features(ax4, fontsize, plot_area, 2, 2, 'k')
+ax4.set_title('$CTL$ SST ($^{\circ}$C)', fontsize=fontsize, pad=1)
+
+add_corner_label(ax4, x_pos, y_pos, '(d)', fontsize)
+
+
+fig.tight_layout(pad=0, w_pad=0.25, h_pad=-10)
+
+plt.savefig(PNG + 'fig3_large_scale_swh_wspd_sst_ESS.png', dpi=300, bbox_inches='tight',
                 facecolor='w', transparent=False)

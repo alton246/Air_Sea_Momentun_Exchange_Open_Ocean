@@ -9,26 +9,16 @@ import numpy.ma as ma
 
 from helpers import *
 
-#We first need to get the paths where the data is located
-# PATH = '/home/disk/orca/adaley17/Research/Stress_Separation/Hurricane_Earl/Data/06HR_Composite_Averages_QC/new_all/'
-PATH = '/home/disk/orca3/adaley17/Projects/air_sea_mom_exchange_open_ocean/'
-PNG = '/home/disk/orca/adaley17/my_stuff/Publications/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
+DATA_PATH = '/home/disk/orca/adaley17/orca3/adaley17/Projects/air_sea_mom_exchange_open_ocean/notebooks/'
+PNG = '/home/disk/orca/adaley17/orca3/adaley17/Projects/Air_Sea_Momentun_Exchange_Open_Ocean/Figures/'
+data = 'storm_relative_qualit_controlled_data.*.nc'
 
-#We also need the file name
-file = 'storm_relative_qualit_controlled_data.*.nc'
-
-#We need to access the data 
-comp_data = xr.open_mfdataset(PATH + file)
-
-#We need to extract from the data the period we are interested in 
-data_subset = comp_data.sel(time=slice('2010-08-30T12:00:00.000000000', '2010-09-01T06:00:00.000000000'))
-
-#Dividing MLD by 9806 to change to meters
-data_subset['mld_awo_qc'] = data_subset['mld_awo_qc']/9806
-data_subset['mld_awo_ws_qc'] = data_subset['mld_awo_ws_qc']/9806
+qual_data = xr.open_mfdataset(DATA_PATH + data, combine='by_coords')
 
 
-# Creating a mask to identify region of cold wake
+data_subset = qual_data
+
+ # Creating a mask to identify region of cold wake
 
 sst_array = data_subset['sst_awo_ws_qc'][7].to_masked_array()  #Changing data to a masked array
 
@@ -42,13 +32,12 @@ sst_mask[sst_masked_ind] = np.nan #Converting the points outside the cold wake t
 
 awo_ws_sst_masked_qc = sst_mask.data # Changing masked data to regular data format
 
+
 data1 = data_subset['swh_awo_qc']
 data2 = data_subset['swh_awo_ws_qc']
 n = len(data_subset['time'])
 x = np.arange(1,n+1,1)
 
-#Etracting Waves ahead and behind of the storm
-#SWH
 swh_ahead, swh_medians_ahead = extract_data_ahead_of_storm(data1, data2, n)
 swh_behind, swh_medians_behind = extract_data_behind_of_storm(data1, data2, n)
 
@@ -83,7 +72,7 @@ num_var = len(awo_data)
 color_options = ['red', 'gray', 'green']
 
 #Figure Options
-ylabels = ['$H_{s}$ Diff (m)', '$U$ Diff $(m/s)$', '$SST$ Diff $(^{\circ}C)$ ']
+ylabels = ['$H_{s}$ Diff (m)', '$SFC$ Diff $(m/s)$', '$SST$ Diff $(^{\circ}C)$ ']
 ylim_max = [1.0, 1.0, 0.5, 0.2, 10]
 ylim_min = [-1.0, -1.0, -0.5, -0.2, -10]
 median_pos = [0.80, 0.15, 0.45, 0.45, 9.0]
@@ -95,9 +84,6 @@ time_info = pd.date_range('2010-08-30 15:00:00',
                           freq='3H')
 # Converting time
 formatted_dates = [pd.Timestamp(date).strftime('%m-%d %H') for date in time_info[::2]]
-
-
-
 
 #Creating Plot
 edge_color='k'
@@ -155,7 +141,7 @@ ax2 = plt.subplot2grid(gridsize, (1, 0), colspan=1, rowspan=1)
 
 #Plots
 ax2.scatter(x, swh_medians_behind, color=color_options[0], s=markersize, zorder=100)
-# ax2_twin.scatter(x, wspd_medians_FR, color=color_options[1], s=markersize, zorder=100)
+
 ax2.axhline(y=0, color='blue', linestyle='--', linewidth=lw, label='y=0') #Horizontal line
 ax2.plot(x, swh_behind_bf_line, color=color_options[0], lw=lw, zorder=100)
 # ax2_twin.plot(x, wspd_FR_bf_line, color=color_options[1], lw=lw, zorder=100, 
@@ -185,7 +171,7 @@ add_corner_label(ax2, x_pos, y_pos, '(b)', fontsize=cl_fontsize)
 ax3 = plt.subplot2grid(gridsize, (2, 0), colspan=1, rowspan=1)
 ax3_twin = ax3.twinx()
 
-#Plots
+# #Plots
 ax3.scatter(x, sfc_medians, color=color_options[1], s=markersize, zorder=100)
 ax3_twin.scatter(x, sst_medians, color=color_options[2], s=markersize, zorder=100)
 plt.axhline(y=0, color='blue', linestyle='--', linewidth=lw, label='y=0') #Horizontal line
@@ -215,7 +201,7 @@ add_legend_to_summary_plot(ax3, color_options[1], color_options[2], 'SFC', 'SST'
 
 fig.tight_layout(pad=0, w_pad=0, h_pad=0)
 
-plt.savefig(PNG + 'fig5_summary_swh_sst_sfc_contour_JAMES.png', dpi=300, bbox_inches='tight',
+plt.savefig(PNG + 'fig12_summary_swh_sst_sfc_contour_ESS.png', dpi=300, bbox_inches='tight',
                 facecolor='w', transparent=False)
 
 
